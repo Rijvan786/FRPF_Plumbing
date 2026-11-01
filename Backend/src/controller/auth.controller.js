@@ -672,7 +672,7 @@ export async function ResetPasswordMailController(req, res) {
         ? "🔧 Security Alert: Reset Password Request — FRRF Plumbing Partner Portal"
         : "🔐 Password Reset Request — FRRF Plumbing Services";
 
-    ── Send email via email service ──
+    // ── Send email via email service ──
     await SendMailDynamicContent({
       email: user.email,
       subject: emailSubject,
