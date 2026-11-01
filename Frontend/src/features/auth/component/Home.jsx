@@ -323,7 +323,7 @@ StitchMCP/generate_screen_from_text
 
           <div className="text-center mt-10">
             <button
-              onClick={() => navigate('/customer')}
+              onClick={() => navigate('/customer/allServices')}
               className="bg-[#0A1628] text-white border-0 px-9 py-3.5 rounded-xl font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm cursor-pointer shadow-[0_4px_18px_rgba(10,22,40,0.22)] transition-all duration-250 hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(10,22,40,0.32)]"
             >
               View Full Pricing Guide →

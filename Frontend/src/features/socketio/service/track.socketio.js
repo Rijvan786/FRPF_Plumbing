@@ -5,7 +5,7 @@ export const InitializedTracksSocket=()=>{
 
   
 
-  const newSocket=io("http://localhost:3000")
+  const newSocket=io("https://frpf-plumbing.onrender.com")
   console.log("Socket Data in APi layer",newSocket);
   return newSocket 
 

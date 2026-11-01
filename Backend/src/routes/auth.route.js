@@ -44,7 +44,7 @@ router.get("/get-me",AuthenticateUser,GetMeController)
 
 router.get("/google",passport.authenticate("google",{scope:["profile","email"]}))
 
-router.get("/google/callback",passport.authenticate("google",{session:false,failureRedirect:Config.NODE_ENV="development"?"http://localhost:5173/":"/"}),
+router.get("/google/callback",passport.authenticate("google",{session:false,failureRedirect:Config.NODE_ENV="development"?"https://frpf-plumbing.onrender.com/":"/"}),
 GoogleCallback
 )
 

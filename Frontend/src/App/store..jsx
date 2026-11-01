@@ -1,12 +1,15 @@
 import { configureStore } from "@reduxjs/toolkit";
 import trackUser from "../features/socketio/state/track.slice.jsx";
 import authReducer from "../features/auth/state/auth.slice.jsx";
-import plumber_services from "../features/order/state/order.slice.jsx"
+import orderReducer from "../features/order/state/order.slice.jsx";
+import plumberServiceReducer from "../features/admin/state/plumer_service.slice.jsx";
 
 export const store = configureStore({
   reducer: {
     auth: authReducer,
-    plumber_services:plumber_services,
+    order: orderReducer,
+    plumber_services: plumberServiceReducer,
+    admin_service: plumberServiceReducer,
     trackUser: trackUser,
   },
 });

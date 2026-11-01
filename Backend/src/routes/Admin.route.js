@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { AuthenticateAdmin, AuthenticateUser } from "../middleware/auth.middleware.js";
-import { CreateServiceController, getTodaysRegisteredPlumbers } from "../controller/admin.controller.js";
+import { CreateServiceController, GetAllServicesController, getTodaysRegisteredPlumbers } from "../controller/admin.controller.js";
 import multer from "multer" 
 import { CreateServiceValidation } from "../validator/createservice.validator.js";
 const router= Router()
@@ -10,6 +10,8 @@ const upload=multer({storage:multer.memoryStorage(),
 })
 
 router.post("/createService",AuthenticateUser,AuthenticateAdmin,upload.array("Images",7),CreateServiceValidation,CreateServiceController)
+
+router.get("/GetallServices",AuthenticateUser,GetAllServicesController)
 
 router.get("/getTodayRegisterTechnicians",getTodaysRegisteredPlumbers)
 

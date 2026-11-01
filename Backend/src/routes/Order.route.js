@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { CreateOrderController,GetOrderDetailController } 
+import { CreateOrderController,GetAllServicesController,GetOrderDetailController } 
 from "../controller/Order.controller.js";
 import { AuthenticateUser } from "../middleware/auth.middleware.js";
 import multer from "multer";
@@ -17,7 +17,7 @@ router.post("/CreateOrder",AuthenticateUser,upload.array("Images",7),CreateOrder
 router.get("/GetOrderDetail",AuthenticateUser,GetOrderDetailController)
 
 
-
+router.get("/GetallServices",AuthenticateUser,GetAllServicesController)
 
 
 

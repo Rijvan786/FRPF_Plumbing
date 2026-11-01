@@ -19,7 +19,7 @@ export const BRAND = {
   cardBorder: "rgba(0, 180, 216, 0.25)",
   lightGray: "#94A3B8",
   white: "#F8FAFC",
-  website: process.env.FRONTEND_URL || "http://localhost:5173",
+  website: process.env.FRONTEND_URL || "https://frpf-plumbing.onrender.com",
   supportEmail: "support@frrfplumbing.com",
   emergencyPhone: "+91 98765 43210",
   // Hosted logo URL — kept lightweight (NO heavy Base64 data URIs) to respect EmailJS 50KB limit

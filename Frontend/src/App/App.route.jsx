@@ -86,7 +86,7 @@ export const router = createBrowserRouter([
     },
     {
         path:"/technician-register",
-        element:<TechnicianDashboard/>
+        element:<TechnicianRegister/>
     },
     {
         path: "/Technician-Profile",

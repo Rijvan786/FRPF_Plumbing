@@ -57,7 +57,7 @@ async function SendTokenResponse(user, res, message) {
 //  REGISTER CONTROLLER
 //  Sends role-specific welcome email on sign-up
 // ──────────────────────────────────────────────
-export async function RegisterController(req, res) { 
+export async function RegisterController(req, res) {  
   try {
     const {
       FullName,
@@ -94,8 +94,6 @@ console.log(contact);
       FullName,
       email,
       contact: ValidContact,
-      isVerifiedTech,
-      experienceYears,
       role,
       password,
 
@@ -110,7 +108,7 @@ console.log(contact);
     });
 
     const verifyUrl = `${
-      Config.BASE_URL || "http://localhost:3000"
+      Config.BASE_URL || process.env.BASE_URL || "https://frpf-plumbing.onrender.com"
     }/api/auth/verify-email?token=${verifyToken}`;
 
     // ── Choose email template based on role ──
@@ -140,12 +138,12 @@ console.log(contact);
     }
 
     // ── Send welcome email ──
-    // await SendMailDynamicContent({
-    //   email: email,
-    //   subject: emailSubject,
-    //   subject_line: emailSubject,
-    //   html: emailHtml,
-    // });
+    await SendMailDynamicContent({
+      email: email,
+      subject: emailSubject,
+      subject_line: emailSubject,
+      html: emailHtml,
+    });
     
 
     console.log(`✅ Welcome email sent to: ${email} (role: ${role})`);
@@ -223,7 +221,7 @@ export async function ResendMailController(req, res) {
       expiresIn: "7d",
     });
 
-    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+    const baseUrl = process.env.BASE_URL || "https://frpf-plumbing.onrender.com";
     const verifyUrl = `${baseUrl}/api/auth/verify-email?token=${verifyToken}`;
 
     let emailHtml;
@@ -248,13 +246,13 @@ export async function ResendMailController(req, res) {
       });
     }
 
-    // await SendMailDynamicContent({
-    //   email: user.email,
-    //   subject: emailSubject,
-    //   subject_line: emailSubject,
-    //   text: `Hello ${user.FullName},\n\nClick the link below to verify your FRRF Plumbing account:\n${verifyUrl}\n\nValid for 7 days under our Work 1st Policy.\n\n— FRRF Plumbing Team`,
-    //   html: emailHtml,
-    // });
+    await SendMailDynamicContent({
+      email: user.email,
+      subject: emailSubject,
+      subject_line: emailSubject,
+      text: `Hello ${user.FullName},\n\nClick the link below to verify your FRRF Plumbing account:\n${verifyUrl}\n\nValid for 7 days under our Work 1st Policy.\n\n— FRRF Plumbing Team`,
+      html: emailHtml,
+    });
 
     // Update timestamp for rate limit tracking
     user.updatedAt = new Date();
@@ -341,7 +339,7 @@ function verificationPage(type, name = "User", role = "customer") {
       ? "Partner"
       : "Customer";
 
-  const frontendUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+  const frontendUrl = process.env.FRONTEND_URL || "https://frpf-plumbing.onrender.com";
   const logoUrl = "https://ik.imagekit.io/Rizwan786/FRRF_Plumbing_Services/frrf-logo.png";
 
   const configs = {
@@ -657,8 +655,8 @@ export async function ResetPasswordMailController(req, res) {
       { expiresIn: "1h" },
     );
 
-    // ── Redirect URL: http://localhost:5173/forgot-passwordpage ──
-    const frontendBaseUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    // ── Redirect URL: https://frpf-plumbing.onrender.com/forgot-passwordpage ──
+    const frontendBaseUrl = Config.FRONTEND_URL || "https://frpf-plumbing.onrender.com";
     const resetUrl = `${frontendBaseUrl}/forgot-passwordpage?token=${resetToken}&email=${encodeURIComponent(user.email)}`;
 
     // ── Product-level modern HTML email template ──
@@ -674,14 +672,14 @@ export async function ResetPasswordMailController(req, res) {
         ? "🔧 Security Alert: Reset Password Request — FRRF Plumbing Partner Portal"
         : "🔐 Password Reset Request — FRRF Plumbing Services";
 
-    // ── Send email via email service ──
-    // await SendMailDynamicContent({
-    //   email: user.email,
-    //   subject: emailSubject,
-    //   subject_line: emailSubject,
-    //   text: `Hello ${user.FullName},\n\nWe received a request to reset your FRRF Plumbing password.\n\nPlease click the link below to set a new password:\n${resetUrl}\n\nNote: This link will expire in 1 hour under our Work 1st Security Guard.\n\nIf you did not request a password reset, please ignore this email.\n\n— FRRF Plumbing Security Team`,
-    //   html: emailHtml,
-    // });
+    ── Send email via email service ──
+    await SendMailDynamicContent({
+      email: user.email,
+      subject: emailSubject,
+      subject_line: emailSubject,
+      text: `Hello ${user.FullName},\n\nWe received a request to reset your FRRF Plumbing password.\n\nPlease click the link below to set a new password:\n${resetUrl}\n\nNote: This link will expire in 1 hour under our Work 1st Security Guard.\n\nIf you did not request a password reset, please ignore this email.\n\n— FRRF Plumbing Security Team`,
+      html: emailHtml,
+    });
 
     console.log(
       `🔑 Password reset email sent to: ${user.email} (${user.role})`,
@@ -751,7 +749,7 @@ export async function GetMeController(req, res) {
   const user = await UserModel.findOne({
     _id: userid,
   });
-  console.log(user);
+
 
   await SendTokenResponse(user, res, "User is fetch successfully");
 }
@@ -980,8 +978,8 @@ export async function GoogleCallback(req, res) {
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
 
-    // ── Target redirect URL: http://localhost:5173/forgot-passwordpage ──
-    const redirectUrl = `http://localhost:5173/`;
+    // ── Target redirect URL: https://frpf-plumbing.onrender.com/ ──
+    const redirectUrl = `https://frpf-plumbing.onrender.com/`;
 
     // ── Generate & send modern email notification ──
     const emailHtml = generateGoogleAuthEmail({
@@ -1016,11 +1014,11 @@ export async function GoogleCallback(req, res) {
         );
       });
     // 
-    return res.redirect("http://localhost:5173/");
+    return res.redirect("https://frpf-plumbing.onrender.com/");
   } catch (error) {
     console.error("❌ GoogleCallback Error:", error.message);
     return res.redirect(
-      "http://localhost:5173/?error=google_failed",
+      "https://frpf-plumbing.onrender.com/?error=google_failed",
     );
   }
 }

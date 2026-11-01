@@ -7,7 +7,7 @@ export async function Initfunction(httpServer){
 
     io =new Server(httpServer,{
         cors:{
-            origin:"http://localhost:5173",
+            origin:["https://frpf-plumbing.onrender.com", "http://localhost:5173"],
             credentials:true
         }
     })

@@ -20,7 +20,7 @@ app.use(morgan("dev"));
 app.use(cookieParser());
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: ["https://frpf-plumbing.onrender.com", "http://localhost:5173"],
   credentials: true,
 }));
 
@@ -34,7 +34,7 @@ app.use(passport.initialize());
 passport.use(new GoogleStrategy({
   clientID: Config.GOOGLE_CLIENT_ID2,
   clientSecret: Config.GOOGLE_CLIENT_SECRET2,
-  callbackURL: "/api/auth/google/callback",
+  callbackURL: "https://frpf-plumbing.onrender.com/api/auth/google/callback",
 },
 (_, __, profile, done) => {
   return done(null, profile);

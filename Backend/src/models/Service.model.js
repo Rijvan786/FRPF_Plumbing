@@ -9,7 +9,7 @@ export const ServiceSchema = mongoose.Schema(
     },
     category:{
       type: String,
-      enum: ["Leakage", "Installation", "Blockage", "Maintenance", "Inspection"],
+      enum: ["Leakage", "Installation", "Blockage", "Maintenance", "Inspection","Full Setup","Emergency SOS"],
     },
     price:{
         type:priceSchema

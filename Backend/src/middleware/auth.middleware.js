@@ -85,8 +85,9 @@ export async function AuthenticateAdmin(req,res,next){
 
             const decoded=jwt.verify(token,Config.JWT_SECRET)
             req.user=decoded
+            console.log(req.user,"Hey");
        
-       if(req.user.role !== "Admin"){
+       if(req.user.role !== "admin"){
         return res.status(400).json({
             message:"Bad request Access denied"
         })

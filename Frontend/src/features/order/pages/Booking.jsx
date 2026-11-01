@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 import { useOrder } from '../hook/useOrder';
-import Navbar from "../../../App/Navbar.jsx"
-
+import { usepulmberService } from '../../admin/hook/useplumberservice.jsx';
+import { setSelectedService } from '../../admin/state/plumer_service.slice.jsx';
+import Navbar from "../../../App/Navbar.jsx";
 
 /* ── Google Fonts (matching Home.jsx) ─────────────────────────── */
 const useGoogleFonts = () => {
@@ -17,28 +19,75 @@ const useGoogleFonts = () => {
   }, []);
 };
 
-/* ── Common Service Categories ────────────────────────────────── */
-const SERVICE_OPTIONS = [
-  { id: 'leakage', label: 'Leakage Repair', icon: '💧' },
-  { id: 'blockage', label: 'Blockage Removal', icon: '🔧' },
-  { id: 'installation', label: 'Installation', icon: '⚙️' },
-  { id: 'maintenance', label: 'Maintenance', icon: '🛡️' },
-  { id: 'fullsetup', label: 'Full Renovation', icon: '🏗️' },
-  { id: 'inspection', label: 'General Inspection', icon: '🔍' },
-];
+/* ── Helper: Icon by Category ── */
+const getCategoryIcon = (category = '') => {
+  const c = String(category).toLowerCase();
+  if (c.includes('leak')) return '💧';
+  if (c.includes('block')) return '🔧';
+  if (c.includes('install')) return '⚙️';
+  if (c.includes('inspect')) return '🔍';
+  if (c.includes('full') || c.includes('setup') || c.includes('renov')) return '🚽';
+  if (c.includes('maint')) return '🛡️';
+  if (c.includes('sos') || c.includes('emerg')) return '🚨';
+  return '🛠️';
+};
 
 const ADDRESS_LABELS = ['Home', 'Office', 'Shop', 'Apartment', 'Other'];
 
 export default function Booking() {
   useGoogleFonts();
   const location = useLocation();
+  const dispatch = useDispatch();
 
-  const {handleCreateOrder}=useOrder()
+  // Order hook
+  const { handleCreateOrder } = useOrder();
 
-  // Pre-selected service if passed via state
-  const initialService = location.state?.service || 'leakage';
+  // Plumber service hook connected to Redux
+  const { handleGetallService } = usepulmberService();
 
-  const [serviceCategory, setServiceCategory] = useState(initialService);
+  // ── PURE REAL DATA FROM REDUX STATE (NO DUMMY DATA) ──
+  const realServices = useSelector((state) => state.plumber_services?.services || []);
+  const reduxLoading = useSelector((state) => state.plumber_services?.loading || false);
+
+  // Initial matching keys passed from navigation (if any)
+  const navServiceKey = (
+    location.state?._id ||
+    location.state?.serviceId ||
+    location.state?.service ||
+    location.state?.category ||
+    ''
+  ).toLowerCase();
+
+  // Currently selected service _id
+  const [selectedServiceId, setSelectedServiceId] = useState('');
+
+  // Fetch real services from backend on mount and store in Redux
+  useEffect(() => {
+    handleGetallService();
+  }, []);
+
+  // Determine active service from real services in Redux
+  const activeService =
+    realServices.find((s) => s._id === selectedServiceId) ||
+    realServices.find((s) => {
+      if (!navServiceKey) return false;
+      return (
+        s._id?.toLowerCase() === navServiceKey ||
+        (s.category && s.category.toLowerCase().includes(navServiceKey)) ||
+        (s.serviceName && s.serviceName.toLowerCase().includes(navServiceKey))
+      );
+    }) ||
+    realServices[0] ||
+    null;
+
+  // Auto-sync selectedService in local state and Redux slice
+  useEffect(() => {
+    if (activeService && activeService._id !== selectedServiceId) {
+      setSelectedServiceId(activeService._id);
+      dispatch(setSelectedService(activeService));
+    }
+  }, [activeService, selectedServiceId, dispatch]);
+
   const [issueDescription, setIssueDescription] = useState('');
   const [issueImage, setIssueImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
@@ -123,10 +172,17 @@ export default function Booking() {
     if (loading || cooldown > 0) return;
     setErrorMessage('');
 
+    if (!activeService?._id) {
+      setErrorMessage('Please wait for real services to load from the database or select a service.');
+      return;
+    }
+
     setLoading(true);
     try {
       const formData = new FormData();
-      const sId = location.state?._id || location.state?.serviceId || location.state?.service || serviceCategory;
+
+      // Real MongoDB _id from the selected service in Redux state
+      const sId = activeService._id;
       formData.append('serviceId', sId);
       formData.append('issueDescription', issueDescription.trim());
       formData.append('label', address.label || 'Home');
@@ -140,10 +196,24 @@ export default function Booking() {
       formData.append('longitude', lng);
       formData.append('scheduleDate', scheduledDate);
 
+      // Append amount & currency from real active service
+      const serviceAmount =
+        typeof activeService.price === 'object' && activeService.price !== null
+          ? activeService.price.amount
+          : activeService.price || 200;
+      const serviceCurrency =
+        typeof activeService.price === 'object' && activeService.price !== null
+          ? activeService.price.currency || 'INR'
+          : 'INR';
+
+      formData.append('amount', String(serviceAmount));
+      formData.append('currency', serviceCurrency);
+
       if (issueImage) {
         formData.append('Images', issueImage);
       }
 
+      console.log('Dispatching order with real MongoDB serviceId from Redux:', sId, 'Title:', activeService.serviceName);
       const res = await handleCreateOrder(formData);
 
       setSuccess(true);
@@ -162,11 +232,11 @@ export default function Booking() {
     }
   };
 
-  const btnDisabled = loading || cooldown > 0;
+  const btnDisabled = loading || cooldown > 0 || !activeService;
 
   return (
     <div
-      className="min-h-screen font-['Inter',sans-serif] bg-[#070E1A] flex flex-col items-center justify-center relative overflow-x-hidden px-4 py-12 pt-24"
+      className="min-h-screen font-['Inter',sans-serif] bg-[#070E1A] flex flex-col items-center justify-center relative overflow-x-hidden px-3.5 sm:px-6 py-12 pt-24"
       style={{
         backgroundImage: "url('/images/hero-bg.png')",
         backgroundSize: 'cover',
@@ -176,8 +246,8 @@ export default function Booking() {
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-[#070E1A]/92 backdrop-blur-sm" />
 
-      {/* Top Navbar with Logo on the top left */}
-      <Navbar/>
+      {/* Top Navbar with Logo */}
+      <Navbar />
 
       {/* Ambient glows */}
       <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/6 rounded-full blur-3xl pointer-events-none" />
@@ -189,7 +259,7 @@ export default function Booking() {
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
-        <div className="bg-white/4 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-9 shadow-[0_32px_80px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+        <div className="bg-white/4 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-9 shadow-[0_32px_80px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
           {/* Header */}
           <div className="mb-6 text-left">
             <div className="inline-flex items-center gap-2 bg-cyan-500/10 border border-cyan-500/25 rounded-full px-3.5 py-1.5 mb-3">
@@ -254,29 +324,127 @@ export default function Booking() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-6 text-left">
-            {/* 1. Service Category Selection */}
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6 text-left">
+            {/* 1. Real Services from Redux State */}
             <div>
-              <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em] mb-2.5">
-                Select Service Category
-              </label>
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
-                {SERVICE_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    type="button"
-                    onClick={() => setServiceCategory(opt.id)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-xl text-xs font-semibold border transition-all text-left cursor-pointer ${
-                      serviceCategory === opt.id
-                        ? 'bg-orange-500/15 border-orange-500 text-orange-400 shadow-[0_0_12px_rgba(255,107,53,0.25)]'
-                        : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/8 hover:text-white'
-                    }`}
-                  >
-                    <span className="text-base">{opt.icon}</span>
-                    <span className="truncate">{opt.label}</span>
-                  </button>
-                ))}
+              <div className="flex items-center justify-between mb-2.5">
+                <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em]">
+                  Select Service
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] sm:text-[11px] text-emerald-400 font-semibold bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+                    ● {realServices.length} Live in Redux
+                  </span>
+                  {activeService?._id && (
+                    <span className="text-[10px] sm:text-[11px] text-cyan-400 font-mono hidden sm:inline">
+                      ID: {activeService._id.slice(0, 6)}...{activeService._id.slice(-4)}
+                    </span>
+                  )}
+                </div>
               </div>
+
+              {/* Loading State when Redux is fetching */}
+              {realServices.length === 0 && reduxLoading && (
+                <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center animate-pulse">
+                  <div className="text-xs text-cyan-300 font-semibold flex items-center justify-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                    Fetching real services from database...
+                  </div>
+                </div>
+              )}
+
+              {/* Real Services Grid from Redux */}
+              {realServices.length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-2.5">
+                  {realServices.map((srv) => {
+                    const isSelected = activeService?._id === srv._id;
+                    const icon = getCategoryIcon(srv.category);
+                    const amount =
+                      typeof srv.price === 'object' && srv.price !== null
+                        ? srv.price.amount
+                        : srv.price;
+                    const currency =
+                      typeof srv.price === 'object' && srv.price !== null
+                        ? srv.price.currency || 'INR'
+                        : 'INR';
+                    const symbol = currency === 'USD' ? '$' : '₹';
+
+                    return (
+                      <button
+                        key={srv._id}
+                        type="button"
+                        onClick={() => {
+                          setSelectedServiceId(srv._id);
+                          dispatch(setSelectedService(srv));
+                        }}
+                        className={`flex items-center gap-2.5 p-2.5 sm:p-3 rounded-xl text-left border transition-all cursor-pointer ${
+                          isSelected
+                            ? 'bg-orange-500/15 border-orange-500 text-orange-400 shadow-[0_0_14px_rgba(255,107,53,0.28)]'
+                            : 'bg-white/5 border-white/10 text-white/70 hover:bg-white/8 hover:text-white'
+                        }`}
+                      >
+                        <span className="text-lg sm:text-xl shrink-0">{icon}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate font-bold text-white text-[11px] sm:text-xs">
+                            {srv.serviceName || srv.category}
+                          </div>
+                          <div className="text-[10px] text-white/45 truncate mt-0.5">
+                            {srv.category} • {symbol}{amount}
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+              )}
+
+              {/* Dynamic Real Service Details Preview Card from Redux */}
+              {activeService && (
+                <div className="mt-3 bg-gradient-to-r from-[#0C1B35]/90 via-[#0B1528]/90 to-[#0A1628]/90 border border-cyan-500/25 rounded-2xl p-3 sm:p-3.5 flex items-center justify-between gap-3 shadow-lg">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={
+                        activeService.serviceImg?.[0]?.url ||
+                        activeService.serviceImg?.[0] ||
+                        '/images/leakage.png'
+                      }
+                      alt={activeService.serviceName}
+                      className="w-12 h-12 rounded-xl object-cover border border-white/10 shrink-0 bg-[#0B1528]"
+                      onError={(e) => {
+                        e.target.src = '/images/leakage.png';
+                      }}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h4 className="font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm text-white truncate">
+                          {activeService.serviceName}
+                        </h4>
+                        <span className="bg-orange-500/20 text-orange-400 text-[10px] font-bold px-2 py-0.5 rounded-full border border-orange-500/30">
+                          {activeService.category}
+                        </span>
+                      </div>
+                      <p className="text-white/45 text-[10px] sm:text-[11px] truncate mt-0.5">
+                        ⚡ Est. {activeService.EstimatedTimeMinutes || 45} mins {activeService.visitCharge ? `• Visit Fee: ₹${activeService.visitCharge}` : ''}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="text-right shrink-0">
+                    <div className="text-[9px] sm:text-[10px] text-white/40 uppercase font-bold tracking-wider">
+                      Fixed Price
+                    </div>
+                    <div className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-sm sm:text-base text-orange-400 leading-tight">
+                      {activeService.price?.currency === 'USD' ? '$' : '₹'}
+                      {typeof activeService.price === 'object' && activeService.price !== null
+                        ? activeService.price.amount
+                        : activeService.price}
+                    </div>
+                    <div className="text-[10px] font-mono text-cyan-400/80">
+                      ID: {activeService._id.slice(-6).toUpperCase()}
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* 2. Issue Description */}
@@ -355,111 +523,91 @@ export default function Booking() {
             {/* 5. Address Details (6 fields: label, street, city, pin_code, latitude, longitude) */}
             <div className="pt-2 border-t border-white/8">
               <div className="flex items-center justify-between mb-3">
-                <span className="text-xs font-bold text-white/70 uppercase tracking-[0.08em]">
-                  Service Address Details
-                </span>
+                <label className="text-xs font-bold text-white/60 uppercase tracking-[0.08em]">
+                  Service Location & Address <span className="text-orange-400">*</span>
+                </label>
                 <button
                   type="button"
                   onClick={detectLocation}
                   disabled={locating}
-                  className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 px-3 py-1.5 rounded-full cursor-pointer transition-all hover:bg-cyan-500/20"
+                  className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1.5 bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-3 py-1 rounded-lg transition-colors cursor-pointer"
                 >
                   <span>📍</span>
-                  <span>{locating ? 'Locating…' : 'Detect GPS Coordinates'}</span>
+                  <span>{locating ? 'Locating GPS…' : 'Auto-detect GPS'}</span>
                 </button>
               </div>
 
-              {/* Address Label Selection */}
-              <div className="mb-4">
-                <label className="block text-[11px] font-semibold text-white/50 mb-1.5">
-                  Address Label
-                </label>
-                <div className="flex flex-wrap gap-2">
-                  {ADDRESS_LABELS.map((lbl) => (
-                    <button
-                      key={lbl}
-                      type="button"
-                      onClick={() => setAddress((p) => ({ ...p, label: lbl }))}
-                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all cursor-pointer ${
-                        address.label === lbl
-                          ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
-                          : 'bg-white/5 border-white/10 text-white/50 hover:text-white'
-                      }`}
-                    >
-                      {lbl}
-                    </button>
-                  ))}
-                </div>
+              {/* Label selector */}
+              <div className="flex gap-2 mb-3">
+                {ADDRESS_LABELS.map((lbl) => (
+                  <button
+                    key={lbl}
+                    type="button"
+                    onClick={() => setAddress((p) => ({ ...p, label: lbl }))}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                      address.label === lbl
+                        ? 'bg-cyan-500/20 border-cyan-400 text-cyan-300'
+                        : 'bg-white/5 border-white/10 text-white/60 hover:text-white'
+                    }`}
+                  >
+                    {lbl}
+                  </button>
+                ))}
               </div>
 
-              {/* Street & City */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
+              {/* Street & Landmark */}
+              <div className="space-y-3">
                 <div>
-                  <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                    Street Address / Flat / Building <span className="text-orange-400">*</span>
-                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Flat 402, Royal Palms, Link Road"
+                    placeholder="House/Flat No., Building Name, Street / Landmark *"
                     value={address.street}
                     onChange={(e) => setAddress((p) => ({ ...p, street: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                    className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                   />
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                    City <span className="text-orange-400">*</span>
-                  </label>
+
+                {/* City & PIN Code */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Mumbai, Delhi, Bangalore"
+                    placeholder="City / Region *"
                     value={address.city}
                     onChange={(e) => setAddress((p) => ({ ...p, city: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                    className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                   />
-                </div>
-              </div>
-
-              {/* PIN Code & Lat/Long Coordinates */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                    PIN Code <span className="text-orange-400">*</span>
-                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 400001"
+                    placeholder="PIN Code (e.g. 452001) *"
                     value={address.pin_code}
                     onChange={(e) => setAddress((p) => ({ ...p, pin_code: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                    className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-3 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                   />
                 </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                    Latitude
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 19.0760"
-                    value={address.latitude}
-                    onChange={(e) => setAddress((p) => ({ ...p, latitude: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
-                  />
-                </div>
-                <div>
-                  <label className="block text-[11px] font-semibold text-white/50 mb-1">
-                    Longitude
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. 72.8777"
-                    value={address.longitude}
-                    onChange={(e) => setAddress((p) => ({ ...p, longitude: e.target.value }))}
-                    className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
-                  />
+
+                {/* Coordinates (Auto-populated or manual) */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Latitude (e.g. 19.0760)"
+                      value={address.latitude}
+                      onChange={(e) => setAddress((p) => ({ ...p, latitude: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-xs sm:text-sm placeholder-white/25 font-mono focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                    />
+                  </div>
+                  <div>
+                    <input
+                      type="text"
+                      placeholder="Longitude (e.g. 72.8777)"
+                      value={address.longitude}
+                      onChange={(e) => setAddress((p) => ({ ...p, longitude: e.target.value }))}
+                      className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-xs sm:text-sm placeholder-white/25 font-mono focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                    />
+                  </div>
                 </div>
               </div>
             </div>

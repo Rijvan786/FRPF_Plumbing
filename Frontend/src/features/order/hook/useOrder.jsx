@@ -1,6 +1,6 @@
 import { useDispatch } from "react-redux";
 import { setLoading } from "../../auth/state/auth.slice";
-import { CreateOrder, GetOrderDetail } from "../service/order.api";
+import { CreateOrder, GetallServices, GetOrderDetail } from "../service/order.api";
 import { setItem } from "../state/order.slice.jsx";
 
 export function useOrder() {
@@ -38,9 +38,33 @@ export function useOrder() {
             dispatch(setLoading(false));
         }
     };
+      const handleGetallService = async () => {
+        try {
+          dispatch(setLoading(true));
+  
+    
+          const data = await GetallServices();
+          const rawList =
+            data?.services || (Array.isArray(data) ? data : data?.data?.services || []);
+    
+          // Store all fetched services into Redux state
+          
+    
+          return data;
+        } catch (error) {
+          console.error("Error in handleGetallService:", error);
+        
+          throw error;
+        } finally {
+          dispatch(setLoading(false));
+        
+        }
+      };
+    
 
     return {
         handleGetOrder,
-        handleCreateOrder
+        handleCreateOrder,
+        handleGetallService
     };
 }

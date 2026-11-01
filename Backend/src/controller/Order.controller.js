@@ -106,3 +106,13 @@ export async function GetOrderDetailController(req,res) {
 
 
 }
+
+
+export async function  GetAllServicesController(req,res) {
+     const services=await ServiceModel.find()
+
+     res.status(200).json({
+      message:"get All services Successfully",
+      services
+     })
+}

@@ -7,7 +7,7 @@ import { uploadFile } from "../service/storage.service.js"
 
 export async function   CreateServiceController(req,res){
     const {serviceName,category,currency,amount,EstimatedTimeMinutes} = req.body
-
+   
 
     
           const images=await Promise.all(req.files.map(async(file)=>{
@@ -16,10 +16,11 @@ export async function   CreateServiceController(req,res){
                 fileName:file.originalname
             })
           }))
+          console.log("Data of Services",serviceName,category,currency,amount,EstimatedTimeMinutes,images);
              
     const services=await ServiceModel.create({
        
-            serviceName:serviceName,
+            serviceName,
             category,
             price:{
                 amount,
@@ -39,7 +40,14 @@ console.log(services);
     })
 }
 
+export async function  GetAllServicesController(req,res) {
+     const services=await ServiceModel.find()
 
+     res.status(200).json({
+      message:"get All services Successfully",
+      services
+     })
+}
 
 export async function getTodaysRegisteredPlumbers (req, res) {
   try {
@@ -81,3 +89,5 @@ export async function  VerifyTechnicianController(req,res){
 
     
 }
+
+
