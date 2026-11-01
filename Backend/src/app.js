@@ -10,6 +10,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import { Config } from "./config/config.js";
 
+
 const app = express();
 
 app.use(express.json());
@@ -17,9 +18,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(morgan("dev"));
 
 app.use(cookieParser());
-app.get('/', (req, res) => {
-  res.send(`<h1>Hello World</h1>`);
-});
+
 app.use(cors({
   origin: "http://localhost:5173",
   credentials: true,
@@ -41,5 +40,23 @@ passport.use(new GoogleStrategy({
   return done(null, profile);
 }
 ));
+
+
+// Public for Backend Deployment
+
+import path from "path";
+
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+const __filename=fileURLToPath(import.meta.url)
+const __dirname=dirname(__filename)
+
+app.use(express.static("./public"))
+
+
+app.use("*name",((req,res)=>{
+
+  res.sendFile(path.join(__dirname,".","../public/index.html"))
+}))
 
 export default app;
