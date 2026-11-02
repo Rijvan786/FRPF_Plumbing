@@ -108,7 +108,7 @@ console.log(contact);
     });
 
     const verifyUrl = `${
-      Config.BASE_URL || process.env.BASE_URL || "https://frpf-plumbing.onrender.com"
+     "https://frpf-plumbing.onrender.com" || Config.BASE_URL || process.env.BASE_URL 
     }/api/auth/verify-email?token=${verifyToken}`;
 
     // ── Choose email template based on role ──

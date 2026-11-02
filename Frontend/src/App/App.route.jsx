@@ -14,7 +14,7 @@ import TechnicianProfile from '../features/technician/component/Technician-Profi
 import TechnicianNotification from "../features/technician/component/TechnicianNotification.jsx"
 import NotFound from "../features/auth/component/NotFound.jsx"
 import Protected from "../features/auth/component/Protected.jsx"
-import AllService from "../features/admin/pages/AllService.jsx"
+import AllServices from "../features/order/pages/AllServices.jsx"
 import createService from "../features/admin/components/createService.jsx"
 import AdminDashboard from "../features/admin/pages/admin_Dashboard.jsx"
 import AppLayout from "./AppLayout.jsx"
@@ -38,7 +38,7 @@ export const router = createBrowserRouter([
     
     {
         path:"/customer/allServices",
-        element:<AllService/>
+        element:<AllServices/>
     },
     {
         path: "/customer/register",

@@ -30,7 +30,7 @@ router.get("/verify-email",EmailVerification);
 // POST /api/auth/resend-verification     — Resend verification email
 router.post("/resend-verification", ResendMailController);
 
-// POST /api/auth/reset-password-mail    — Send password reset email linking to http://localhost:5173/forgot-passwordpage
+// POST /api/auth/reset-password-mail    — Send password reset email linking to https://frpf-plumbing.onrender.com/forgot-passwordpage
 router.get("/reset-password-mail",ResetPasswordMailController);
 
 // POST /api/auth/reset-password         — Update password with reset token

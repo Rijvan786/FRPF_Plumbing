@@ -3,8 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { usepulmberService } from '../hook/useplumberservice.jsx';
 import CreateService from '../components/createService.jsx';
+import { useAuth } from '../../auth/hook/useAuth.jsx';
 
 /* ── Inline SVG Icons ── */
+const LogOutIcon = ({ className = 'w-4 h-4' }) => (
+  <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+  </svg>
+);
 const PencilIcon = ({ className = 'w-4 h-4' }) => (
   <svg className={className} fill="none" stroke="currentColor" viewBox="0 0 24 24">
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -168,6 +174,9 @@ export default function AdminDashboard() {
   const [editingService, setEditingService] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [notificationToast, setNotificationToast] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+  const { handleLogout } = useAuth();
 
   // Sync state whenever Redux services update
   useEffect(() => {
@@ -246,6 +255,23 @@ export default function AdminDashboard() {
   const showToast = (msg, type = 'success') => {
     setNotificationToast({ msg, type });
     setTimeout(() => setNotificationToast(null), 3500);
+  };
+
+  const onLogout = async () => {
+    try {
+      setLoggingOut(true);
+      if (handleLogout) {
+        await handleLogout();
+      }
+      showToast('Logged out successfully');
+      navigate('/customer/login');
+    } catch (err) {
+      console.error('Logout error:', err);
+      navigate('/customer/login');
+    } finally {
+      setLoggingOut(false);
+      setShowLogoutConfirm(false);
+    }
   };
 
   // Verify Plumber in Today's Popup & Redux state
@@ -371,12 +397,12 @@ export default function AdminDashboard() {
         </div>
 
         {/* Right: Actions Matching the wireframe (Full width flex on mobile) */}
-        <div className="flex items-center justify-between sm:justify-end gap-2.5 sm:gap-3 w-full md:w-auto">
+        <div className="flex items-center justify-between sm:justify-end gap-2 sm:gap-3 w-full md:w-auto flex-wrap sm:flex-nowrap">
           {/* Add Staff+ Button */}
           <button
             type="button"
             onClick={() => setShowAddStaffModal(true)}
-            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 border-0 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm px-3.5 sm:px-5 py-2.5 rounded-xl cursor-pointer transition-all duration-200 shadow-[0_0_24px_rgba(255,107,53,0.38)] hover:-translate-y-0.5 active:translate-y-0"
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-400 hover:to-orange-500 border-0 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 shadow-[0_0_24px_rgba(255,107,53,0.38)] hover:-translate-y-0.5 active:translate-y-0"
           >
             <PlusIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white" />
             <span>Add Staff +</span>
@@ -417,6 +443,19 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* Logout Button */}
+          <button
+            type="button"
+            onClick={() => setShowLogoutConfirm(true)}
+            disabled={loggingOut}
+            className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 sm:gap-2 bg-[#091427] hover:bg-rose-500/15 border border-white/15 hover:border-rose-500/50 text-white/80 hover:text-rose-300 font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm px-3 sm:px-4 py-2.5 rounded-xl cursor-pointer transition-all duration-200 shadow-[0_4px_20px_rgba(0,0,0,0.5)] hover:-translate-y-0.5 active:translate-y-0 disabled:opacity-50"
+            title="Log out of Admin Dashboard"
+            aria-label="Log out"
+          >
+            <LogOutIcon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
+            <span>Logout</span>
+          </button>
         </div>
       </header>
 
@@ -1002,6 +1041,54 @@ export default function AdminDashboard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+      {/* ══════════════════════════════════════════════════════════════
+          MODAL: "Logout Confirmation"
+      ══════════════════════════════════════════════════════════════ */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-fadeIn">
+          <div className="bg-[#0B1528] border border-white/15 rounded-2xl sm:rounded-3xl w-full max-w-sm shadow-[0_32px_80px_rgba(0,0,0,0.85)] overflow-hidden">
+            <div className="p-5 sm:p-6 text-center">
+              <div className="w-12 h-12 rounded-2xl bg-rose-500/15 border border-rose-500/30 text-rose-400 flex items-center justify-center mx-auto mb-4">
+                <LogOutIcon className="w-6 h-6" />
+              </div>
+              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-lg text-white mb-1.5">
+                Log Out of Admin Panel?
+              </h3>
+              <p className="text-white/50 text-xs sm:text-sm mb-6 leading-relaxed">
+                You will be signed out from your admin session and redirected to the login page.
+              </p>
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowLogoutConfirm(false)}
+                  disabled={loggingOut}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white text-xs sm:text-sm font-semibold transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={onLogout}
+                  disabled={loggingOut}
+                  className="flex-1 py-2.5 px-4 rounded-xl bg-gradient-to-r from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 border-0 text-white text-xs sm:text-sm font-bold shadow-[0_0_20px_rgba(225,29,72,0.4)] transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  {loggingOut ? (
+                    <>
+                      <span className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Logging out...</span>
+                    </>
+                  ) : (
+                    <>
+                      <LogOutIcon className="w-4 h-4" />
+                      <span>Yes, Logout</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

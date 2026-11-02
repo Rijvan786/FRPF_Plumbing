@@ -17,7 +17,7 @@ router.post("/CreateOrder",AuthenticateUser,upload.array("Images",7),CreateOrder
 router.get("/GetOrderDetail",AuthenticateUser,GetOrderDetailController)
 
 
-router.get("/GetallServices",AuthenticateUser,GetAllServicesController)
+router.get("/GetallServices",GetAllServicesController)
 
 
 
