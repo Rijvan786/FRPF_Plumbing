@@ -222,7 +222,7 @@ export function clientWelcomeEmail(arg1, arg2) {
 /* ═══════════════════════════════════════════════════════════
    ② TECHNICIAN WELCOME EMAIL (Tailwind CSS, <12KB)
 ═══════════════════════════════════════════════════════════ */
-export function technicianWelcomeEmail(arg1, arg2, arg3, arg4, arg5) {
+export function   technicianWelcomeEmail(arg1, arg2, arg3, arg4, arg5) {
   let FullName, email, experienceYears, city, verifyUrl;
   if (typeof arg1 === "object" && arg1 !== null) {
     ({ FullName, email, experienceYears, city, verifyUrl } = arg1);

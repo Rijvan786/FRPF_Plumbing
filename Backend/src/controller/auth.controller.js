@@ -20,7 +20,8 @@ import AddressModel from "../models/address.model.js";
 //  HELPER : Sign JWT & send cookie + JSON
 // ──────────────────────────────────────────────
 async function SendTokenResponse(user, res, message) {
-  const token = jwt.sign(
+ try {
+    const token = jwt.sign(
     {
       id: user._id,
       FullName: user.FullName,
@@ -33,7 +34,7 @@ async function SendTokenResponse(user, res, message) {
 
   res.cookie("token", token, {
     httpOnly: true,
-    secure: Config.NODE_ENV === "production",
+    secure: true,
     sameSite: "Strict",
     maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
   });
@@ -51,6 +52,13 @@ async function SendTokenResponse(user, res, message) {
       experienceYears: user.experienceYears,
     },
   });
+ } catch (error) {
+  console.log(error);
+    res.status(200).json({
+      message:"Internal Server Error",
+      err:error.message
+    })
+ }
 }
 
 // ──────────────────────────────────────────────
@@ -740,7 +748,9 @@ export async function LogoutController(req, res) {
 
   await BlackListModel.create({ token: token });
 
-  await SendTokenResponse(user, res, "User logout successfully");
+ req.status(200).json({
+  message:"User Logout Successfully"
+ })
 }
 
 export async function GetMeController(req, res) {
@@ -749,7 +759,6 @@ export async function GetMeController(req, res) {
   const user = await UserModel.findOne({
     _id: userid,
   });
-
 
   await SendTokenResponse(user, res, "User is fetch successfully");
 }
