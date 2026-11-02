@@ -52,9 +52,9 @@ const TECHNICIAN_ROLES = [
   'General Maintenance Plumber',
 ];
 
-export default function   TechnicianRegister() {
+export default function TechnicianRegister() {
   useGoogleFonts();
-  const {handleTechRegister}=useTechnician()
+  const { handleTechRegister } = useTechnician();
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -146,7 +146,7 @@ export default function   TechnicianRegister() {
         email: form.email.trim(),
         contact: (form.contact ? (form.contact.startsWith('+') ? form.contact : `+${form.contact}`) : '').trim(),
         password: form.password,
-        role:"technician",
+        role: "technician",
         experienceYears: Number(form.experienceYears) || 0,
         street: form.street.trim(),
         city: form.city.trim(),
@@ -165,7 +165,7 @@ export default function   TechnicianRegister() {
       } else if (typeof apiMsg === 'string') {
         setErrorMsg(apiMsg);
       } else {
-        setErrorMsg(err?.message || 'Registration failed. Please check your details and try again.');
+        setErrorMsg(err?.message || 'Registration failed. Please verify your details.');
       }
     } finally {
       setLoading(false);
@@ -176,7 +176,7 @@ export default function   TechnicianRegister() {
 
   return (
     <div
-      className="min-h-screen font-['Inter',sans-serif] bg-[#070E1A] flex flex-col items-center justify-center relative overflow-x-hidden px-4 py-12 pt-24"
+      className="min-h-screen font-['Inter',sans-serif] bg-[#070E1A] flex flex-col items-center justify-center relative overflow-x-hidden px-3.5 sm:px-6 py-8 sm:py-12 pt-20 sm:pt-24"
       style={{
         backgroundImage: "url('/images/hero-bg.png')",
         backgroundSize: 'cover',
@@ -184,14 +184,14 @@ export default function   TechnicianRegister() {
       }}
     >
       {/* Dark overlay */}
-      <div className="absolute inset-0 bg-[#070E1A]/92 backdrop-blur-sm" />
+      <div className="absolute inset-0 bg-[#070E1A]/92 backdrop-blur-sm pointer-events-none" />
 
-      {/* Top Navbar with Logo on the top left */}
+      {/* Top Navbar */}
       <Navbar />
 
       {/* Ambient glows */}
-      <div className="absolute top-0 right-1/4 w-96 h-96 bg-cyan-500/6 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-orange-500/6 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-0 left-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-orange-500/10 rounded-full blur-3xl pointer-events-none" />
 
       {/* Form Card */}
       <div
@@ -199,15 +199,15 @@ export default function   TechnicianRegister() {
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}
       >
-        <div className="bg-white/4 border border-white/10 rounded-2xl sm:rounded-3xl p-6 sm:p-9 shadow-[0_32px_80px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
+        <div className="bg-white/4 border border-white/10 rounded-2xl sm:rounded-3xl p-4 sm:p-7 md:p-9 shadow-[0_32px_80px_rgba(0,0,0,0.6)] backdrop-blur-2xl">
           {/* Header */}
-          <div className="mb-6 text-left">
-            <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/25 rounded-full px-3.5 py-1.5 mb-3">
-              <span className="text-orange-400 text-[11px] font-bold tracking-widest uppercase">
+          <div className="mb-5 sm:mb-6 text-left">
+            <div className="inline-flex items-center gap-2 bg-orange-500/10 border border-orange-500/25 rounded-full px-3 sm:px-3.5 py-1 sm:py-1.5 mb-2.5 sm:mb-3">
+              <span className="text-orange-400 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase">
                 🛠️ Technician Partner Onboarding
               </span>
             </div>
-            <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-2xl sm:text-3xl text-white tracking-tight leading-tight mb-2">
+            <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl sm:text-2xl md:text-3xl text-white tracking-tight leading-tight mb-1.5 sm:mb-2">
               Join as Verified Technician
             </h1>
             <p className="text-white/50 text-xs sm:text-sm leading-relaxed">
@@ -217,12 +217,12 @@ export default function   TechnicianRegister() {
 
           {/* Error Message */}
           {errorMsg && (
-            <div className="bg-rose-500/10 border border-rose-500/25 rounded-xl px-4 py-3 mb-5 text-rose-400 text-xs font-semibold">
+            <div className="bg-rose-500/10 border border-rose-500/25 rounded-xl px-3.5 sm:px-4 py-2.5 sm:py-3 mb-4 sm:mb-5 text-rose-400 text-xs font-semibold leading-relaxed">
               ⚠️ {errorMsg}
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4 text-left">
+          <form onSubmit={handleSubmit} className="space-y-3.5 sm:space-y-4 text-left">
             {/* 1. Full Name */}
             <div>
               <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em] mb-1.5">
@@ -234,12 +234,12 @@ export default function   TechnicianRegister() {
                 placeholder="e.g. Ramesh Kumar Verma"
                 value={form.fullName}
                 onChange={set('fullName')}
-                className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 sm:px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
               />
             </div>
 
-            {/* 2. Email & Contact (2-col grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* 2. Email & Contact (2-col grid on sm+) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
               <div>
                 <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em] mb-1.5">
                   Email Address <span className="text-orange-400">*</span>
@@ -250,7 +250,7 @@ export default function   TechnicianRegister() {
                   placeholder="ramesh@example.com"
                   value={form.email}
                   onChange={set('email')}
-                  className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                  className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 sm:px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                 />
               </div>
               <div>
@@ -266,7 +266,7 @@ export default function   TechnicianRegister() {
                     containerClass="!w-full"
                     inputClass="!w-full !bg-white/5 !border !border-white/12 !rounded-xl !pl-14 !pr-4 !py-3 !text-sm !text-white !placeholder-white/25 hover:!border-white/20 focus:!border-cyan-500/60 focus:!ring-1 focus:!ring-cyan-500/30 !transition-all !duration-200"
                     buttonClass="!bg-white/5 !border !border-white/12 !border-r-0 !rounded-l-xl hover:!bg-white/10"
-                    dropdownClass="!bg-[#0c1a2e] !border !border-white/15 !text-white !rounded-xl !mt-1 !shadow-2xl"
+                    dropdownClass="!bg-[#0c1a2e] !border !border-white/15 !text-white !rounded-xl !mt-1 !shadow-2xl max-w-[280px] sm:max-w-none"
                     searchClass="!bg-[#070e1a] !border !border-white/10 !text-white !rounded-lg !px-3 !py-2 !text-sm"
                     enableSearch
                   />
@@ -283,15 +283,15 @@ export default function   TechnicianRegister() {
                 <input
                   type={showPw ? 'text' : 'password'}
                   required
-                  placeholder="Min 8 chars with 1 number & 1 symbol (e.g. Pass@123)"
+                  placeholder="Min 8 chars (e.g. Pass@123)"
                   value={form.password}
                   onChange={set('password')}
-                  className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 pr-12 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                  className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 sm:px-4 py-2.5 pr-12 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPw((p) => !p)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/35 hover:text-cyan-400 transition-colors"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-white/35 hover:text-cyan-400 transition-colors cursor-pointer"
                 >
                   <EyeIcon open={showPw} />
                 </button>
@@ -301,8 +301,8 @@ export default function   TechnicianRegister() {
               </p>
             </div>
 
-            {/* 4. Role & Experience (2-col grid) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+            {/* 4. Role & Experience (2-col grid on sm+) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
               <div>
                 <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em] mb-1.5">
                   Primary Role / Speciality <span className="text-orange-400">*</span>
@@ -311,7 +311,7 @@ export default function   TechnicianRegister() {
                   required
                   value={form.role}
                   onChange={set('role')}
-                  className="w-full bg-[#0E1A2D] border border-white/12 rounded-xl px-4 py-2.5 text-white text-sm font-medium focus:outline-none focus:border-cyan-500/60 transition-all cursor-pointer"
+                  className="w-full bg-[#0E1A2D] border border-white/12 rounded-xl px-3.5 sm:px-4 py-2.5 text-white text-sm font-medium focus:outline-none focus:border-cyan-500/60 transition-all cursor-pointer"
                 >
                   {TECHNICIAN_ROLES.map((r) => (
                     <option key={r} value={r} className="bg-[#0A1628] text-white">
@@ -332,14 +332,14 @@ export default function   TechnicianRegister() {
                   placeholder="e.g. 5"
                   value={form.experienceYears}
                   onChange={set('experienceYears')}
-                  className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
+                  className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 sm:px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
                 />
               </div>
             </div>
 
             {/* 5. Address Details (street, city, pin_code, latitude, longitude) */}
             <div className="pt-2 border-t border-white/8">
-              <div className="flex items-center justify-between mb-3">
+              <div className="flex flex-col xs:flex-row xs:items-center justify-between gap-2 mb-3">
                 <span className="text-xs font-bold text-white/70 uppercase tracking-[0.08em]">
                   Workshop / Operational Area
                 </span>
@@ -347,7 +347,7 @@ export default function   TechnicianRegister() {
                   type="button"
                   onClick={detectLocation}
                   disabled={locating}
-                  className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 px-3 py-1.5 rounded-full cursor-pointer transition-all hover:bg-cyan-500/20"
+                  className="inline-flex items-center gap-1.5 text-xs text-cyan-400 hover:text-cyan-300 bg-cyan-500/10 border border-cyan-500/25 px-3 py-1.5 rounded-full cursor-pointer transition-all hover:bg-cyan-500/20 self-start xs:self-auto"
                 >
                   <span>📍</span>
                   <span>{locating ? 'Locating…' : 'Detect GPS Location'}</span>
@@ -363,7 +363,7 @@ export default function   TechnicianRegister() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Shop 12, Plumbing Hub, MG Road"
+                    placeholder="e.g. Shop 12, Plumbing Hub"
                     value={form.street}
                     onChange={set('street')}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -376,7 +376,7 @@ export default function   TechnicianRegister() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Mumbai, Delhi, Bangalore"
+                    placeholder="e.g. Bhopal, Indore"
                     value={form.city}
                     onChange={set('city')}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -384,8 +384,8 @@ export default function   TechnicianRegister() {
                 </div>
               </div>
 
-              {/* PIN Code, Latitude & Longitude (3-col grid) */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              {/* PIN Code, Latitude & Longitude (3-col grid on xs+) */}
+              <div className="grid grid-cols-1 xs:grid-cols-3 gap-2.5 sm:gap-3">
                 <div>
                   <label className="block text-[11px] font-semibold text-white/50 mb-1">
                     PIN Code <span className="text-orange-400">*</span>
@@ -393,7 +393,7 @@ export default function   TechnicianRegister() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 400001"
+                    placeholder="e.g. 462011"
                     value={form.pin_code}
                     onChange={set('pin_code')}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -405,7 +405,7 @@ export default function   TechnicianRegister() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 19.0760"
+                    placeholder="e.g. 23.2599"
                     value={form.latitude}
                     onChange={set('latitude')}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -417,7 +417,7 @@ export default function   TechnicianRegister() {
                   </label>
                   <input
                     type="text"
-                    placeholder="e.g. 72.8777"
+                    placeholder="e.g. 77.4126"
                     value={form.longitude}
                     onChange={set('longitude')}
                     className="w-full bg-white/5 border border-white/12 rounded-xl px-3.5 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -446,7 +446,7 @@ export default function   TechnicianRegister() {
             <button
               type="submit"
               disabled={btnDisabled}
-              className={`w-full relative flex items-center justify-center gap-2.5 py-3.5 rounded-xl font-['Plus_Jakarta_Sans',sans-serif] font-bold text-[15px] border-0 transition-all duration-300 mt-2 ${
+              className={`w-full relative flex items-center justify-center gap-2.5 py-3 sm:py-3.5 rounded-xl font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm sm:text-[15px] border-0 transition-all duration-300 mt-2 ${
                 btnDisabled
                   ? 'bg-white/10 text-white/30 cursor-not-allowed'
                   : 'bg-gradient-to-r from-orange-500 to-orange-600 text-white shadow-[0_0_24px_rgba(255,107,53,0.4)] hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(255,107,53,0.5)] cursor-pointer'
@@ -490,7 +490,7 @@ export default function   TechnicianRegister() {
           </form>
 
           {/* Footer links */}
-          <div className="mt-5 pt-4 border-t border-white/6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
+          <div className="mt-5 pt-4 border-t border-white/6 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40 text-center sm:text-left">
             <span>
               Already a registered partner?{' '}
               <Link to="/customer/login" className="text-cyan-400 font-bold hover:text-cyan-300 transition-colors">

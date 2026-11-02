@@ -126,34 +126,34 @@ export default function TechnicianProfile() {
       <div className="fixed inset-0 bg-gradient-to-b from-[#070E1A]/95 via-[#0A1628]/92 to-[#070E1A]/98 pointer-events-none" />
 
       {/* Ambient Glowing Spheres matching Home.jsx */}
-      <div className="fixed top-24 right-1/4 w-[480px] h-[480px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
-      <div className="fixed bottom-24 left-10 w-[420px] h-[420px] bg-orange-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed top-24 right-1/4 w-[320px] sm:w-[480px] h-[320px] sm:h-[480px] bg-cyan-500/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-24 left-6 sm:left-10 w-[280px] sm:w-[420px] h-[280px] sm:h-[420px] bg-orange-500/10 rounded-full blur-[100px] sm:blur-[140px] pointer-events-none" />
 
       {/* ── Top Header Navigation Bar ─────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#0A1628]/80 backdrop-blur-2xl border-b border-white/10">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+      <header className="sticky top-0 z-40 bg-[#0A1628]/85 backdrop-blur-2xl border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-3.5 sm:px-6 py-3 sm:py-4 flex items-center justify-between gap-2">
           <button
             onClick={() => navigate(-1)}
-            className="flex items-center gap-2 text-xs sm:text-sm font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-3.5 py-2 rounded-xl transition-all duration-200 cursor-pointer"
+            className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-2.5 sm:px-3.5 py-1.5 sm:py-2 rounded-xl transition-all duration-200 cursor-pointer shrink-0"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M15 19l-7-7 7-7" />
             </svg>
-            Back
+            <span className="hidden xs:inline">Back</span>
           </button>
 
-          <div className="flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee]" />
-            <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-base sm:text-lg text-white tracking-tight">
-              Technician Partner Profile
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] shrink-0" />
+            <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-sm sm:text-base md:text-lg text-white tracking-tight truncate">
+              Technician Profile
             </h1>
             {loadingApi && (
-              <span className="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin ml-1" />
+              <span className="w-3.5 h-3.5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin shrink-0 ml-0.5" />
             )}
           </div>
 
           {/* Availability Toggle */}
-          <div className="flex items-center gap-3 bg-white/5 border border-white/10 px-3 py-1.5 rounded-2xl">
+          <div className="flex items-center gap-2 sm:gap-3 bg-white/5 border border-white/10 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-2xl shrink-0">
             <div className="flex items-center gap-1.5">
               <span
                 className={`w-2 h-2 rounded-full ${
@@ -163,22 +163,22 @@ export default function TechnicianProfile() {
                 }`}
               />
               <span
-                className={`text-xs font-bold ${
+                className={`hidden sm:inline text-xs font-bold ${
                   isAvailable ? 'text-emerald-400' : 'text-white/40'
                 }`}
               >
-                {isAvailable ? 'Active Duty' : 'Offline'}
+                {isAvailable ? 'Active' : 'Offline'}
               </span>
             </div>
             <button
               type="button"
               onClick={() => setIsAvailable(!isAvailable)}
-              className={`relative w-11 h-6 rounded-full transition-colors duration-300 cursor-pointer ${
+              className={`relative w-10 sm:w-11 h-5 sm:h-6 rounded-full transition-colors duration-300 cursor-pointer ${
                 isAvailable ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.45)]' : 'bg-white/15'
               }`}
             >
               <span
-                className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                className={`absolute top-0.5 left-0.5 w-4 sm:w-5 h-4 sm:h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
                   isAvailable ? 'translate-x-5' : 'translate-x-0'
                 }`}
               />
@@ -189,40 +189,40 @@ export default function TechnicianProfile() {
 
       {/* ── Main Content Container ────────────────────────────── */}
       <main
-        className={`relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 transition-all duration-700 ease-out transform ${
+        className={`relative z-10 max-w-6xl mx-auto px-3.5 sm:px-6 py-6 sm:py-10 transition-all duration-700 ease-out transform ${
           visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
         }`}
       >
         {/* Profile Hero Card */}
-        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-3xl p-6 sm:p-8 mb-8 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
+        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 shadow-[0_20px_60px_rgba(0,0,0,0.6)] relative overflow-hidden">
           {/* Subtle gradient accent bar along the top */}
           <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-cyan-400 via-orange-500 to-blue-500" />
 
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6">
-            <div className="relative">
+          <div className="flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-4 sm:gap-6">
+            <div className="relative shrink-0">
               <img
                 src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=260&q=80"
                 alt="Profile Avatar"
-                className="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl object-cover border-2 border-cyan-500/40 ring-4 ring-cyan-500/10 shadow-[0_0_24px_rgba(6,182,212,0.3)]"
+                className="w-20 h-20 sm:w-26 sm:h-26 md:w-28 md:h-28 rounded-2xl object-cover border-2 border-cyan-500/40 ring-4 ring-cyan-500/10 shadow-[0_0_24px_rgba(6,182,212,0.3)]"
               />
-              <span className="absolute -bottom-2 -right-2 bg-emerald-500 text-slate-950 p-1 rounded-full border-2 border-[#0A1628] shadow-[0_0_10px_#10b981]">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+              <span className="absolute -bottom-1.5 -right-1.5 bg-emerald-500 text-slate-950 p-1 rounded-full border-2 border-[#0A1628] shadow-[0_0_10px_#10b981]">
+                <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                 </svg>
               </span>
             </div>
 
-            <div className="flex-1">
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+            <div className="flex-1 w-full min-w-0">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-2">
                 <div>
-                  <h2 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-2xl sm:text-3xl text-white tracking-tight">
+                  <h2 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl sm:text-2xl md:text-3xl text-white tracking-tight break-words">
                     {fullName}
                   </h2>
-                  <p className="text-cyan-400 font-semibold text-sm sm:text-base mt-0.5">
+                  <p className="text-cyan-400 font-semibold text-xs sm:text-sm md:text-base mt-0.5">
                     {role} • CPVC & Sanitary Specialist
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center justify-center sm:justify-end gap-2">
                   <button
                     onClick={fetchGetMeData}
                     title="Refresh data from server"
@@ -240,27 +240,27 @@ export default function TechnicianProfile() {
               </div>
 
               {/* Rating & Location & Contact (Real Data from GetMe) */}
-              <div className="flex flex-wrap items-center gap-3 sm:gap-5 mt-3 pt-3 border-t border-white/10 text-xs sm:text-sm">
-                <div className="flex items-center gap-1 bg-white/5 border border-white/10 px-3 py-1 rounded-xl">
+              <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5 sm:gap-4 mt-3 pt-3 border-t border-white/10 text-xs sm:text-sm">
+                <div className="flex items-center gap-1 bg-white/5 border border-white/10 px-2.5 sm:px-3 py-1 rounded-xl">
                   <div className="flex text-amber-400">
                     {[1, 2, 3, 4, 5].map((i) => (
-                      <svg key={i} className="w-4 h-4 fill-current" viewBox="0 0 20 20">
+                      <svg key={i} className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current" viewBox="0 0 20 20">
                         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                       </svg>
                     ))}
                   </div>
                   <span className="ml-1 font-bold text-white">4.95</span>
-                  <span className="text-white/40 font-medium">(214 Verified Jobs)</span>
+                  <span className="text-white/40 font-medium hidden xs:inline">(214 Jobs)</span>
                 </div>
 
                 <div className="flex items-center gap-1.5 text-white/70">
                   <span>📍</span>
-                  <span className="font-medium text-white/80">
+                  <span className="font-medium text-white/80 truncate max-w-[150px] sm:max-w-none">
                     {city}
                   </span>
                   <span className="text-white/30">•</span>
-                  <span className="text-cyan-300 font-semibold">
-                    {experienceYears}+ Years Experience
+                  <span className="text-cyan-300 font-semibold whitespace-nowrap">
+                    {experienceYears}+ Yrs Exp
                   </span>
                 </div>
 
@@ -271,7 +271,7 @@ export default function TechnicianProfile() {
 
                 <div className="flex items-center gap-1.5 text-white/60">
                   <span>✉️</span>
-                  <span className="font-mono text-white/80">{email}</span>
+                  <span className="font-mono text-white/80 truncate max-w-[180px] sm:max-w-none">{email}</span>
                 </div>
               </div>
             </div>
@@ -279,73 +279,73 @@ export default function TechnicianProfile() {
         </div>
 
         {/* ── Metric Performance Cards (matching Home.jsx style) ── */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-cyan-500/40 transition-all duration-300 group">
-            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Total Jobs</p>
-            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-4 mb-6 sm:mb-8">
+          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 sm:p-5 hover:border-cyan-500/40 transition-all duration-300 group">
+            <p className="text-[10px] sm:text-xs uppercase font-bold text-white/50 tracking-wider mb-1.5 sm:mb-2">Total Jobs</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
               1,248
             </p>
-            <p className="text-[11px] text-emerald-400 font-bold mt-2 flex items-center gap-1">
+            <p className="text-[10px] sm:text-[11px] text-emerald-400 font-bold mt-1.5 sm:mt-2 flex items-center gap-1">
               <span>↑ 18%</span>
-              <span className="text-white/40 font-normal">from last month</span>
+              <span className="text-white/40 font-normal hidden xs:inline">growth</span>
             </p>
           </div>
 
-          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-emerald-500/40 transition-all duration-300 group">
-            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Completion Rate</p>
-            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 sm:p-5 hover:border-emerald-500/40 transition-all duration-300 group">
+            <p className="text-[10px] sm:text-xs uppercase font-bold text-white/50 tracking-wider mb-1.5 sm:mb-2">Completion</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
               99.2%
             </p>
-            <p className="text-[11px] text-white/40 mt-2">Zero unaddressed callbacks</p>
+            <p className="text-[10px] sm:text-[11px] text-white/40 mt-1.5 sm:mt-2 truncate">Zero callbacks</p>
           </div>
 
-          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-300 group">
-            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">This Month</p>
-            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 sm:p-5 hover:border-orange-500/40 transition-all duration-300 group">
+            <p className="text-[10px] sm:text-xs uppercase font-bold text-white/50 tracking-wider mb-1.5 sm:mb-2">This Month</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
               ₹48.5k
             </p>
-            <p className="text-[11px] text-emerald-400 font-bold mt-2">Payout verified</p>
+            <p className="text-[10px] sm:text-[11px] text-emerald-400 font-bold mt-1.5 sm:mt-2 truncate">Payout verified</p>
           </div>
 
-          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-violet-500/40 transition-all duration-300 group">
-            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Avg Response</p>
-            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+          <div className="bg-[#0A1628]/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3.5 sm:p-5 hover:border-violet-500/40 transition-all duration-300 group">
+            <p className="text-[10px] sm:text-xs uppercase font-bold text-white/50 tracking-wider mb-1.5 sm:mb-2">Avg Response</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-2xl sm:text-3xl md:text-4xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
               18m
             </p>
-            <p className="text-[11px] text-white/40 mt-2">Top 5% across network</p>
+            <p className="text-[10px] sm:text-[11px] text-white/40 mt-1.5 sm:mt-2 truncate">Top 5% speed</p>
           </div>
         </div>
 
         {/* ── Weekly Earnings Chart ─────────────────────────────── */}
-        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-3xl p-6 sm:p-8 mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-6">
+        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-4 sm:mb-6">
             <div>
-              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-lg text-white">
+              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-base sm:text-lg text-white">
                 Weekly Earnings Overview
               </h3>
-              <p className="text-xs text-white/50 mt-0.5">
-                Calculated on real-time plumbing and emergency dispatch payouts
+              <p className="text-[11px] sm:text-xs text-white/50 mt-0.5">
+                Calculated on real-time plumbing and dispatch payouts
               </p>
             </div>
-            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3.5 py-1.5 rounded-xl">
-              <span className="text-xs text-white/50 font-bold uppercase">7-Day Total:</span>
-              <span className="text-sm font-black text-cyan-400">₹{totalWeekly.toLocaleString('en-IN')}</span>
+            <div className="inline-flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-xl self-start sm:self-auto">
+              <span className="text-[11px] text-white/50 font-bold uppercase">7-Day Total:</span>
+              <span className="text-xs sm:text-sm font-black text-cyan-400">₹{totalWeekly.toLocaleString('en-IN')}</span>
             </div>
           </div>
 
           {/* Bar Chart Bars */}
-          <div className="flex items-end gap-2.5 sm:gap-4 h-40 pt-4 px-2">
+          <div className="flex items-end gap-1.5 sm:gap-3 md:gap-4 h-36 sm:h-40 pt-4 px-1 sm:px-2">
             {weeklyEarnings.map((item, i) => (
-              <div key={i} className="flex-1 flex flex-col items-center gap-2 h-full justify-end group">
-                <span className="text-[11px] font-bold text-white/0 group-hover:text-cyan-300 transition-all duration-200">
+              <div key={i} className="flex-1 flex flex-col items-center gap-1.5 sm:gap-2 h-full justify-end group">
+                <span className="text-[9px] sm:text-[11px] font-bold text-white/0 group-hover:text-cyan-300 transition-all duration-200 truncate">
                   ₹{item.amount}
                 </span>
                 <div
-                  className="w-full bg-gradient-to-t from-cyan-600/80 via-cyan-500 to-blue-400 rounded-xl transition-all duration-300 group-hover:scale-y-105 group-hover:shadow-[0_0_16px_rgba(6,182,212,0.5)] cursor-pointer"
+                  className="w-full bg-gradient-to-t from-cyan-600/80 via-cyan-500 to-blue-400 rounded-lg sm:rounded-xl transition-all duration-300 group-hover:scale-y-105 group-hover:shadow-[0_0_16px_rgba(6,182,212,0.5)] cursor-pointer"
                   style={{ height: item.height }}
                   title={`${item.day}: ₹${item.amount}`}
                 />
-                <span className="text-xs font-bold text-white/60 group-hover:text-white transition-colors">
+                <span className="text-[10px] sm:text-xs font-bold text-white/60 group-hover:text-white transition-colors">
                   {item.day}
                 </span>
               </div>
@@ -354,31 +354,31 @@ export default function TechnicianProfile() {
         </div>
 
         {/* ── Specializations & Services (matching Home.jsx) ────── */}
-        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-3xl p-6 sm:p-8 mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
-          <div className="flex items-center justify-between mb-5">
+        <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-white/12 rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 mb-6 sm:mb-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          <div className="flex items-center justify-between gap-2 mb-4 sm:mb-5">
             <div>
-              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-lg text-white">
+              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-base sm:text-lg text-white">
                 Certified Specializations
               </h3>
-              <p className="text-xs text-white/50 mt-0.5">
-                Qualified CPVC plumbing capabilities and service categories
+              <p className="text-[11px] sm:text-xs text-white/50 mt-0.5">
+                Qualified CPVC plumbing capabilities
               </p>
             </div>
-            <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-3 py-1 rounded-full">
-              6 Active Badges
+            <span className="text-[11px] sm:text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-2.5 sm:px-3 py-1 rounded-full shrink-0">
+              6 Badges
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-3">
             {specializations.map((spec, index) => (
               <div
                 key={index}
-                className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-3.5 hover:bg-white/8 hover:border-cyan-500/40 transition-all duration-200"
+                className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-3.5 hover:bg-white/8 hover:border-cyan-500/40 transition-all duration-200"
               >
-                <span className="text-2xl p-2 bg-white/5 rounded-xl">{spec.icon}</span>
-                <div>
-                  <p className="text-sm font-bold text-white">{spec.name}</p>
-                  <p className="text-[11px] text-emerald-400 font-semibold">ISO 9001 Certified</p>
+                <span className="text-xl sm:text-2xl p-2 bg-white/5 rounded-xl shrink-0">{spec.icon}</span>
+                <div className="min-w-0">
+                  <p className="text-xs sm:text-sm font-bold text-white truncate">{spec.name}</p>
+                  <p className="text-[10px] sm:text-[11px] text-emerald-400 font-semibold">ISO 9001 Certified</p>
                 </div>
               </div>
             ))}
@@ -386,27 +386,27 @@ export default function TechnicianProfile() {
         </div>
 
         {/* ── Footer Navigation Actions ─────────────────────────── */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/4 border border-white/10 rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-white/4 border border-white/10 rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
           <div className="flex items-center gap-3">
-            <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-orange-400 text-lg">
+            <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-orange-400 text-lg shrink-0">
               🛠️
             </span>
-            <div>
-              <h4 className="text-sm font-bold text-white">Technician Portal Hub</h4>
-              <p className="text-xs text-white/50">Manage your duty status, job history, and dispatch alerts</p>
+            <div className="min-w-0">
+              <h4 className="text-xs sm:text-sm font-bold text-white truncate">Technician Portal Hub</h4>
+              <p className="text-[11px] sm:text-xs text-white/50 truncate">Manage duty status, job history & dispatch alerts</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-col xs:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 w-full sm:w-auto">
             <button
               onClick={() => navigate('/Technician-Dashboard')}
-              className="flex-1 sm:flex-none bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm px-6 py-3 rounded-xl shadow-[0_0_24px_rgba(255,107,53,0.38)] transition-all duration-200 cursor-pointer"
+              className="flex-1 sm:flex-none text-center bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl shadow-[0_0_24px_rgba(255,107,53,0.38)] transition-all duration-200 cursor-pointer"
             >
-              Go to Dashboard →
+              Dashboard →
             </button>
             <button
               onClick={() => navigate('/TechnicianNotification')}
-              className="flex-1 sm:flex-none bg-white/5 hover:bg-white/10 border border-white/12 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm px-5 py-3 rounded-xl transition-all duration-200 cursor-pointer"
+              className="flex-1 sm:flex-none text-center bg-white/5 hover:bg-white/10 border border-white/12 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-xs sm:text-sm px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl transition-all duration-200 cursor-pointer"
             >
               Notifications
             </button>
