@@ -1,100 +1,200 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+/* ── Google Fonts (matching Home.jsx) ─────────────────────────── */
+const useGoogleFonts = () => {
+  useEffect(() => {
+    if (document.getElementById('pp-gf')) return;
+    const l = document.createElement('link');
+    l.id = 'pp-gf';
+    l.rel = 'stylesheet';
+    l.href =
+      'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap';
+    document.head.appendChild(l);
+  }, []);
+};
+
 export default function TechnicianNotification() {
+  useGoogleFonts();
   const navigate = useNavigate();
   const [filter, setFilter] = useState('all');
+  const [visible, setVisible] = useState(false);
 
-  const notifications = [
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  const [notificationList, setNotificationList] = useState([
     {
       id: 1,
-      type: 'new-job',
-      title: 'New Repair Request',
+      type: 'emergency',
+      title: 'Emergency Leakage Repair',
       customer: 'Aman Verma',
-      laptop: 'Dell XPS 13',
-      issue: 'Overheating & unexpected shutdown',
+      phone: '+91 98260 12345',
+      serviceType: 'Concealed CPVC Pipe Burst & Bathroom Wall Leak',
+      category: 'Leakage Repair',
+      icon: '💧',
       location: 'Plot 45, MP Nagar Zone-II, Bhopal',
-      distance: '1.8 km',
-      time: '10 mins ago',
+      distance: '1.8 km away',
+      estimatedPrice: '₹450 + Parts',
+      time: '8 mins ago',
       urgent: true,
-      unread: true
+      unread: true,
     },
     {
       id: 2,
-      type: 'new-job',
-      title: 'New Repair Request',
+      type: 'blockage',
+      title: 'High Priority Sewer Blockage',
       customer: 'Rohit Malviya',
-      laptop: 'HP Pavilion 14',
-      issue: 'Keyboard keys not responding',
+      phone: '+91 98931 67890',
+      serviceType: 'Kitchen Sink & Trap Line Deep Clog Removal',
+      category: 'Blockage Removal',
+      icon: '🔧',
       location: 'House 12, Indrapuri Sector C, Bhopal',
-      distance: '3.4 km',
-      time: '45 mins ago',
+      distance: '3.4 km away',
+      estimatedPrice: '₹600',
+      time: '35 mins ago',
       urgent: true,
-      unread: true
+      unread: true,
     },
     {
       id: 3,
-      type: 'new-job',
-      title: 'New Repair Request',
+      type: 'installation',
+      title: 'Water Tank & Motor Fitting',
       customer: 'Sneha Patel',
-      laptop: 'Lenovo IdeaPad Slim 3',
-      issue: 'Windows OS crash / boot loop',
+      phone: '+91 97555 44332',
+      serviceType: '1000L Overhead Sintex Tank & 1HP Pump Commissioning',
+      category: 'Smart Installation',
+      icon: '⚙️',
       location: 'Flat 302, Arera Colony, Bhopal',
-      distance: '2.1 km',
+      distance: '2.1 km away',
+      estimatedPrice: '₹1,200',
       time: '2 hours ago',
       urgent: false,
-      unread: false
-    }
-  ];
+      unread: false,
+    },
+    {
+      id: 4,
+      type: 'sanitary',
+      title: 'Sanitary & Mixer Tap Repair',
+      customer: 'Kavita Joshi',
+      phone: '+91 99812 77889',
+      serviceType: 'Quarter-Turn Wall Mixer Tap & Flush Valve Replacement',
+      category: 'Bathroom Fixtures',
+      icon: '🚰',
+      location: 'E-3, Shahpura Lake View, Bhopal',
+      distance: '4.2 km away',
+      estimatedPrice: '₹400',
+      time: 'Yesterday',
+      urgent: false,
+      unread: false,
+    },
+  ]);
 
-  const filtered = notifications.filter(n => {
+  const markAsRead = (id) => {
+    setNotificationList((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, unread: false } : n))
+    );
+  };
+
+  const dismissNotification = (id) => {
+    setNotificationList((prev) => prev.filter((n) => n.id !== id));
+  };
+
+  const markAllRead = () => {
+    setNotificationList((prev) => prev.map((n) => ({ ...n, unread: false })));
+  };
+
+  const filtered = notificationList.filter((n) => {
     if (filter === 'unread') return n.unread;
     if (filter === 'urgent') return n.urgent;
     return true;
   });
 
-  const unreadCount = notifications.filter(n => n.unread).length;
+  const unreadCount = notificationList.filter((n) => n.unread).length;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#070E1A] text-white font-['Plus_Jakarta_Sans',sans-serif] selection:bg-cyan-500/30 selection:text-cyan-300 relative overflow-x-hidden">
       
-      {/* Header */}
-      <header className="border-b border-slate-200 sticky top-0 bg-white z-10">
+      {/* Background Hero Image matching Home.jsx with smooth entrance */}
+      <div
+        className={`fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out pointer-events-none transform ${
+          visible ? 'opacity-30 scale-100' : 'opacity-0 scale-105'
+        }`}
+        style={{ backgroundImage: `url('/images/hero-bg.png')` }}
+      />
+
+      {/* Deep Midnight Navy Gradient Overlays matching Home.jsx */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[#070E1A]/95 via-[#0A1628]/92 to-[#070E1A]/98 pointer-events-none" />
+
+      {/* Ambient Glowing Spheres matching Home.jsx */}
+      <div className="fixed top-24 right-1/4 w-[480px] h-[480px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-24 left-10 w-[420px] h-[420px] bg-orange-500/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* ── Top Header Bar ───────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#0A1628]/85 backdrop-blur-2xl border-b border-white/10">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <button onClick={() => navigate('/Technician-Dashboard')} className="p-2 hover:bg-slate-100 rounded-lg">
-                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 19l-7-7 7-7" />
+              <button
+                onClick={() => navigate('/Technician-Dashboard')}
+                className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-white/70 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 px-3 py-2 rounded-xl transition-all cursor-pointer"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.2" d="M15 19l-7-7 7-7" />
                 </svg>
+                Dashboard
               </button>
-              <h1 className="text-2xl font-black text-slate-900">Notifications</h1>
-              {unreadCount > 0 && (
-                <span className="px-2 py-1 bg-red-500 text-white text-xs font-bold rounded-full">
-                  {unreadCount}
-                </span>
-              )}
+
+              <div className="flex items-center gap-2">
+                <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl sm:text-2xl text-white tracking-tight">
+                  Dispatch Alerts
+                </h1>
+                {unreadCount > 0 && (
+                  <span className="px-2.5 py-0.5 bg-orange-500 text-white text-xs font-bold rounded-full shadow-[0_0_12px_rgba(255,107,53,0.5)]">
+                    {unreadCount} New
+                  </span>
+                )}
+              </div>
             </div>
 
-            <button onClick={() => navigate('/Technician-Profile')} className="w-9 h-9 bg-slate-100 rounded-full overflow-hidden">
-              <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&q=80" alt="" className="w-full h-full object-cover" />
-            </button>
+            <div className="flex items-center gap-3">
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-xs text-cyan-400 hover:text-cyan-300 font-bold px-2 py-1 transition-colors cursor-pointer"
+                >
+                  Mark All Read
+                </button>
+              )}
+              <button
+                onClick={() => navigate('/Technician-Profile')}
+                className="w-9 h-9 rounded-xl overflow-hidden border-2 border-cyan-500/40 ring-2 ring-cyan-500/20 shadow-[0_0_10px_rgba(6,182,212,0.3)] transition-all cursor-pointer"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=100&q=80"
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            </div>
           </div>
 
           {/* Filter Pills */}
-          <div className="flex gap-2">
+          <div className="flex items-center gap-2 overflow-x-auto pb-1">
             {[
-              { id: 'all', label: 'All' },
+              { id: 'all', label: 'All Dispatches' },
               { id: 'unread', label: `Unread (${unreadCount})` },
-              { id: 'urgent', label: 'Urgent' }
-            ].map(tab => (
+              { id: 'urgent', label: '🚨 Urgent Emergency' },
+            ].map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setFilter(tab.id)}
-                className={`px-4 py-2 text-sm font-bold rounded-lg transition-colors ${
-                  filter === tab.id 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                className={`px-4 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap ${
+                  filter === tab.id
+                    ? 'bg-gradient-to-r from-orange-500 to-orange-700 text-white shadow-[0_0_20px_rgba(255,107,53,0.35)]'
+                    : 'bg-white/5 border border-white/10 text-white/60 hover:text-white hover:bg-white/10'
                 }`}
               >
                 {tab.label}
@@ -104,86 +204,136 @@ export default function TechnicianNotification() {
         </div>
       </header>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 py-6">
+      {/* ── Main Notifications Content ───────────────────────── */}
+      <main
+        className={`relative z-10 max-w-4xl mx-auto px-4 sm:px-6 py-6 sm:py-8 transition-all duration-700 ease-out transform ${
+          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
+      >
         <div className="space-y-4">
-          {filtered.map(notification => (
+          {filtered.map((item) => (
             <div
-              key={notification.id}
-              className={`bg-white border-2 rounded-lg overflow-hidden transition-colors ${
-                notification.unread 
-                  ? 'border-blue-500 shadow-lg' 
-                  : 'border-slate-200 hover:border-slate-300'
+              key={item.id}
+              className={`bg-[#0A1628]/85 backdrop-blur-2xl border rounded-3xl overflow-hidden transition-all duration-200 ${
+                item.unread
+                  ? 'border-cyan-500/50 shadow-[0_0_30px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/30'
+                  : 'border-white/10 hover:border-white/20'
               }`}
             >
-              {/* Header */}
-              <div className="p-5 border-b border-slate-200">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex items-start gap-3">
-                    <div className="w-12 h-12 bg-blue-50 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      </svg>
-                    </div>
-                    <div>
-                      <h3 className="font-black text-slate-900 flex items-center gap-2">
-                        {notification.title}
-                        {notification.urgent && (
-                          <span className="px-2 py-0.5 bg-red-500 text-white text-xs font-bold rounded">URGENT</span>
-                        )}
-                      </h3>
-                      <p className="text-sm text-slate-600 flex items-center gap-2 mt-1">
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        {notification.time}
-                      </p>
-                    </div>
+              {/* Header Card */}
+              <div className="p-5 sm:p-6 border-b border-white/10 flex items-start justify-between gap-4">
+                <div className="flex items-start gap-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-2xl shrink-0">
+                    {item.icon}
                   </div>
-                  {notification.unread && (
-                    <span className="w-2 h-2 bg-blue-600 rounded-full flex-shrink-0 mt-2" />
+                  <div>
+                    <div className="flex items-center gap-2.5 flex-wrap">
+                      <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-base sm:text-lg text-white">
+                        {item.title}
+                      </h3>
+                      {item.urgent && (
+                        <span className="px-2.5 py-0.5 bg-rose-500/15 border border-rose-500/30 text-rose-400 text-[10px] font-bold rounded-full tracking-wider uppercase animate-pulse">
+                          🚨 IMMEDIATE DISPATCH
+                        </span>
+                      )}
+                      <span className="text-[11px] font-semibold text-cyan-400 bg-cyan-500/10 border border-cyan-500/25 px-2.5 py-0.5 rounded-full">
+                        {item.category}
+                      </span>
+                    </div>
+                    <p className="text-xs text-white/50 flex items-center gap-1.5 mt-1">
+                      <span>⏱️</span>
+                      <span>Received {item.time}</span>
+                      <span className="text-white/20">•</span>
+                      <span className="text-cyan-300 font-medium">Auto-assigned to your radius</span>
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  {item.unread && (
+                    <span className="w-2.5 h-2.5 rounded-full bg-cyan-400 shadow-[0_0_8px_#22d3ee] animate-pulse" />
                   )}
+                  <button
+                    onClick={() => dismissNotification(item.id)}
+                    className="text-white/30 hover:text-white/70 p-1.5 transition-colors cursor-pointer"
+                    title="Dismiss notification"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
               </div>
 
-              {/* Details */}
-              <div className="p-5 bg-slate-50">
-                <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                  <div className="bg-white rounded-lg p-3 border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold mb-1">CUSTOMER</p>
-                    <p className="font-bold text-slate-900">{notification.customer}</p>
+              {/* Service & Customer Details */}
+              <div className="p-5 sm:p-6 bg-white/[0.02]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+                    <p className="text-[10px] uppercase font-bold text-white/50 tracking-wider mb-1">
+                      Customer
+                    </p>
+                    <p className="font-bold text-white text-sm">{item.customer}</p>
+                    <p className="font-mono text-xs text-white/60 mt-0.5">{item.phone}</p>
                   </div>
-                  <div className="bg-white rounded-lg p-3 border border-slate-200">
-                    <p className="text-xs text-slate-500 font-bold mb-1">LAPTOP MODEL</p>
-                    <p className="font-bold text-slate-900">{notification.laptop}</p>
+
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5">
+                    <p className="text-[10px] uppercase font-bold text-white/50 tracking-wider mb-1">
+                      Standard Payout
+                    </p>
+                    <p className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-emerald-400 text-lg">
+                      {item.estimatedPrice}
+                    </p>
+                    <p className="text-[10px] text-emerald-400/80 font-medium mt-0.5">Instant credit on job completion</p>
                   </div>
                 </div>
 
-                <div className="bg-white rounded-lg p-4 border border-slate-200 mb-4">
-                  <p className="text-xs text-slate-500 font-bold mb-2">REPORTED ISSUE</p>
-                  <p className="text-sm text-slate-700">{notification.issue}</p>
-                  <div className="flex items-start gap-2 mt-3 pt-3 border-t border-slate-200 text-sm text-slate-600">
-                    <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                    </svg>
-                    <span>{notification.location}</span>
-                    <span className="ml-auto px-2 py-0.5 bg-blue-50 text-blue-600 text-xs font-bold rounded whitespace-nowrap">
-                      {notification.distance}
+                {/* Service Details Box */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-4 mb-4">
+                  <p className="text-[10px] uppercase font-bold text-white/50 tracking-wider mb-1.5">
+                    Reported Plumbing Problem
+                  </p>
+                  <p className="text-xs sm:text-sm text-cyan-300 font-semibold mb-2">
+                    {item.serviceType}
+                  </p>
+
+                  <div className="flex items-center justify-between text-xs text-white/60 pt-2.5 border-t border-white/10">
+                    <div className="flex items-center gap-1.5">
+                      <span>📍</span>
+                      <span className="truncate max-w-[240px] sm:max-w-none">{item.location}</span>
+                    </div>
+                    <span className="px-2.5 py-0.5 bg-cyan-500/15 border border-cyan-500/30 text-cyan-300 text-xs font-bold rounded-lg shrink-0">
+                      {item.distance}
                     </span>
                   </div>
                 </div>
 
-                {/* Actions */}
-                <div className="flex gap-3">
+                {/* Action Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3">
                   <button
-                    onClick={() => navigate('/Technician-Dashboard')}
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors"
+                    onClick={() => {
+                      markAsRead(item.id);
+                      navigate('/Technician-Dashboard');
+                    }}
+                    className="flex-1 bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm py-3 px-6 rounded-xl shadow-[0_0_20px_rgba(255,107,53,0.35)] transition-all cursor-pointer text-center"
                   >
-                    Accept Job
+                    Accept & Dispatch →
                   </button>
-                  <button className="flex-1 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold py-3 rounded-lg transition-colors">
-                    Dismiss
-                  </button>
+
+                  <a
+                    href={`tel:${item.phone}`}
+                    className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm py-3 px-5 rounded-xl transition-all cursor-pointer"
+                  >
+                    📞 Call Client
+                  </a>
+
+                  {item.unread && (
+                    <button
+                      onClick={() => markAsRead(item.id)}
+                      className="bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white font-bold text-sm py-3 px-4 rounded-xl transition-all cursor-pointer"
+                    >
+                      Mark Read
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -191,14 +341,22 @@ export default function TechnicianNotification() {
 
           {/* Empty State */}
           {filtered.length === 0 && (
-            <div className="text-center py-16 bg-slate-50 rounded-lg border-2 border-slate-200">
-              <div className="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg className="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-                </svg>
+            <div className="text-center py-16 bg-[#0A1628]/80 backdrop-blur-2xl border border-white/10 rounded-3xl p-8">
+              <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4 text-3xl">
+                🔔
               </div>
-              <p className="font-bold text-slate-900 mb-1">No notifications</p>
-              <p className="text-sm text-slate-600">Check back later for new repair requests</p>
+              <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl text-white mb-2">
+                No Notifications Found
+              </h3>
+              <p className="text-xs sm:text-sm text-white/50 max-w-sm mx-auto mb-6">
+                You're all caught up! New emergency plumbing calls and scheduled customer requests will appear here in real time.
+              </p>
+              <button
+                onClick={() => setFilter('all')}
+                className="px-5 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white text-xs font-bold transition-all cursor-pointer"
+              >
+                Reset Filter
+              </button>
             </div>
           )}
         </div>

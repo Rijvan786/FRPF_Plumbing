@@ -1,7 +1,7 @@
 import axios from "axios"
-
+const API_URL =  "https://frpf-plumbing.onrender.com"
 const api=axios.create({
-    baseURL:"https://frpf-plumbing.onrender.com",
+    baseURL:API_URL,
     withCredentials:true
 })
 

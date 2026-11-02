@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import Navbar from "../../../App/Navbar.jsx"
+import { useTechnician } from '../hook/useTechnician.jsx';
+import PhoneInputPkg from 'react-phone-input-2';
+import 'react-phone-input-2/lib/style.css';
+
+const PhoneInput = PhoneInputPkg.default ?? PhoneInputPkg;
 
 /* ── Google Fonts (matching Home.jsx) ─────────────────────────── */
 const useGoogleFonts = () => {
@@ -47,8 +52,9 @@ const TECHNICIAN_ROLES = [
   'General Maintenance Plumber',
 ];
 
-export default function TechnicianRegister() {
+export default function   TechnicianRegister() {
   useGoogleFonts();
+  const {handleTechRegister}=useTechnician()
   const navigate = useNavigate();
 
   const [form, setForm] = useState({
@@ -89,6 +95,11 @@ export default function TechnicianRegister() {
 
   const set = (k) => (e) => setForm((prev) => ({ ...prev, [k]: e.target.value }));
 
+  const formData = form;
+  const handlePhoneChange = (value) => {
+    setForm((f) => ({ ...f, contact: value, phone: value }));
+  };
+
   // Auto-detect GPS Coordinates
   const detectLocation = () => {
     if (!navigator.geolocation) {
@@ -113,22 +124,52 @@ export default function TechnicianRegister() {
     );
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (loading || cooldown > 0) return;
     setErrorMsg('');
 
-    if (form.password.length < 6) {
-      setErrorMsg('Password should be at least 6 characters long.');
+    if (form.password.length < 8 || !/(?=.*\d)/.test(form.password) || !/(?=.*[@$!%*?&#])/.test(form.password)) {
+      setErrorMsg('Password must be at least 8 characters and include at least one number and one special character (@$!%*?&#).');
       return;
     }
 
-    setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    if (!agree) {
+      setErrorMsg('Please agree to the technician partner policy to proceed.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await handleTechRegister({
+        FullName: form.fullName.trim(),
+        email: form.email.trim(),
+        contact: (form.contact ? (form.contact.startsWith('+') ? form.contact : `+${form.contact}`) : '').trim(),
+        password: form.password,
+        role:"technician",
+        experienceYears: Number(form.experienceYears) || 0,
+        street: form.street.trim(),
+        city: form.city.trim(),
+        pin_code: form.pin_code.trim(),
+        longitude: Number(form.longitude) || 0,
+        latitude: Number(form.latitude) || 0,
+      });
+
       setCooldown(60); // 1-minute active cooldown
       navigate('/Technician-Dashboard');
-    }, 2000);
+    } catch (err) {
+      console.error('Technician registration error:', err);
+      const apiMsg = err?.response?.data?.message;
+      if (Array.isArray(apiMsg)) {
+        setErrorMsg(apiMsg.map((m) => m.msg || m.message).join(', '));
+      } else if (typeof apiMsg === 'string') {
+        setErrorMsg(apiMsg);
+      } else {
+        setErrorMsg(err?.message || 'Registration failed. Please check your details and try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const btnDisabled = loading || cooldown > 0;
@@ -216,14 +257,20 @@ export default function TechnicianRegister() {
                 <label className="block text-xs font-bold text-white/60 uppercase tracking-[0.08em] mb-1.5">
                   Contact Number (WhatsApp) <span className="text-orange-400">*</span>
                 </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder="+91 98765 43210"
-                  value={form.contact}
-                  onChange={set('contact')}
-                  className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
-                />
+                <div className="relative">
+                  <PhoneInput
+                    country={"in"}
+                    value={formData.phone || form.contact}
+                    onChange={handlePhoneChange}
+                    inputProps={{ name: "phone", id: "phone", required: true, placeholder: "98765 43210" }}
+                    containerClass="!w-full"
+                    inputClass="!w-full !bg-white/5 !border !border-white/12 !rounded-xl !pl-14 !pr-4 !py-3 !text-sm !text-white !placeholder-white/25 hover:!border-white/20 focus:!border-cyan-500/60 focus:!ring-1 focus:!ring-cyan-500/30 !transition-all !duration-200"
+                    buttonClass="!bg-white/5 !border !border-white/12 !border-r-0 !rounded-l-xl hover:!bg-white/10"
+                    dropdownClass="!bg-[#0c1a2e] !border !border-white/15 !text-white !rounded-xl !mt-1 !shadow-2xl"
+                    searchClass="!bg-[#070e1a] !border !border-white/10 !text-white !rounded-lg !px-3 !py-2 !text-sm"
+                    enableSearch
+                  />
+                </div>
               </div>
             </div>
 
@@ -236,7 +283,7 @@ export default function TechnicianRegister() {
                 <input
                   type={showPw ? 'text' : 'password'}
                   required
-                  placeholder="Min 6 characters"
+                  placeholder="Min 8 chars with 1 number & 1 symbol (e.g. Pass@123)"
                   value={form.password}
                   onChange={set('password')}
                   className="w-full bg-white/5 border border-white/12 rounded-xl px-4 py-2.5 pr-12 text-white text-sm placeholder-white/25 font-medium focus:outline-none focus:border-cyan-500/60 focus:bg-white/8 transition-all"
@@ -249,6 +296,9 @@ export default function TechnicianRegister() {
                   <EyeIcon open={showPw} />
                 </button>
               </div>
+              <p className="text-[11px] text-white/40 mt-1">
+                Must be at least 8 characters with at least one number and one special symbol (@$!%*?&#).
+              </p>
             </div>
 
             {/* 4. Role & Experience (2-col grid) */}

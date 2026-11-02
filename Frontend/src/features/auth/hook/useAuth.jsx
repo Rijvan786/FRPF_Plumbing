@@ -119,11 +119,10 @@ const handleLogout=async()=>{
 
         dispatch(setLoading(true))
            const data =await Logout()
-   console.log(`handleLogout Function in useAuth ${data}`);
+ 
        dispatch(setUser(null))
 
-       
-
+    
     } catch (error) {
         
         console.log(`Error in handleLogout in useAuth ${error}`);

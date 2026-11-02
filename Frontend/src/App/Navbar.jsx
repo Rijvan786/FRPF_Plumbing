@@ -317,7 +317,9 @@ export default function Navbar() {
                 </Link>
                 <button
                   type="button"
-                  onClick={onLogout}
+                  onClick={()=>{
+                    onLogout()
+                  }}
                   className="flex-1 bg-rose-500/15 border border-rose-500/30 text-rose-300 py-2 rounded-full font-semibold text-center text-xs cursor-pointer"
                 >
                   Sign Out

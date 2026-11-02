@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { useOrder } from '../hook/useOrder';
-import { usepulmberService } from '../../admin/hook/useplumberservice.jsx';
 import { setSelectedService } from '../../admin/state/plumer_service.slice.jsx';
 import Navbar from "../../../App/Navbar.jsx";
 
@@ -40,14 +39,12 @@ export default function Booking() {
   const dispatch = useDispatch();
 
   // Order hook
-  const { handleCreateOrder } = useOrder();
+  const { handleCreateOrder,handleGetallService} = useOrder();
 
-  // Plumber service hook connected to Redux
-  const { handleGetallService } = usepulmberService();
 
   // ── PURE REAL DATA FROM REDUX STATE (NO DUMMY DATA) ──
-  const realServices = useSelector((state) => state.plumber_services?.services || []);
-  const reduxLoading = useSelector((state) => state.plumber_services?.loading || false);
+  const realServices = useSelector((state) => state.order?.services || []);
+  const reduxLoading = useSelector((state) => state.order?.loading || false);
 
   // Initial matching keys passed from navigation (if any)
   const navServiceKey = (

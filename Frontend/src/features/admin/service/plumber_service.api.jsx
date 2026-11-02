@@ -1,9 +1,10 @@
 import axios from "axios";
 
-const api = axios.create({
-  baseURL: "https://frpf-plumbing.onrender.com/api/admin",
-  withCredentials: true,
-});
+const API_URL =  "https://frpf-plumbing.onrender.com/api/admin" ;
+const api=axios.create({
+    baseURL:API_URL,
+    withCredentials:true
+})  
 
 export async function CreateService(formData) {
   // If payload is FormData, axios handles multipart headers

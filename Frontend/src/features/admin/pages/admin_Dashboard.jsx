@@ -508,9 +508,7 @@ export default function AdminDashboard() {
             </button>
           </div>
 
-          <p className="text-white/45 text-xs hidden md:block">
-            Showing real data from <code className="text-cyan-400 bg-cyan-950/40 px-1.5 py-0.5 rounded text-[11px]">handleGetallService()</code>
-          </p>
+          
         </div>
 
         {/* Loading Skeletons */}

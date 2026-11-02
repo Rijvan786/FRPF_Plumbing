@@ -9,7 +9,6 @@ export const store = configureStore({
     auth: authReducer,
     order: orderReducer,
     plumber_services: plumberServiceReducer,
-    admin_service: plumberServiceReducer,
     trackUser: trackUser,
   },
 });

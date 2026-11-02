@@ -1,133 +1,496 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
+import { useAuth } from '../../auth/hook/useAuth.jsx';
+import { GetMe } from '../../auth/service/auth.api.jsx';
+import { setUser } from '../../auth/state/auth.slice.jsx';
+import { setTechnician } from '../state/technician.slice.jsx';
+
+/* ── Google Fonts (matching Home.jsx) ─────────────────────────── */
+const useGoogleFonts = () => {
+  useEffect(() => {
+    if (document.getElementById('pp-gf')) return;
+    const l = document.createElement('link');
+    l.id = 'pp-gf';
+    l.rel = 'stylesheet';
+    l.href =
+      'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap';
+    document.head.appendChild(l);
+  }, []);
+};
 
 export default function TechnicianDashboard() {
-  const [isOnline, setIsOnline] = useState(true);
+  useGoogleFonts();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { handleGetME, handleLogout } = useAuth();
+
+  // Load technician user from Redux store with fallback
+  const reduxAuthUser = useSelector((state) => state.auth?.User);
+  const reduxTechUser = useSelector((state) => state.technician?.technician);
+  const initialUser = reduxAuthUser || reduxTechUser || null;
+
+  const [userData, setUserData] = useState(() => {
+    if (initialUser) return initialUser;
+    try {
+      const saved = localStorage.getItem('user');
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const [isOnline, setIsOnline] = useState(true);
+  const [visible, setVisible] = useState(false);
+  const [acceptedJob, setAcceptedJob] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const onLogout = async () => {
+    try {
+      setLoggingOut(true);
+      if (handleLogout) {
+        await handleLogout();
+      }
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setLoggingOut(false);
+      navigate('/customer/login');
+    }
+  };
+
+  // Entrance animation
+  useEffect(() => {
+    const t = setTimeout(() => setVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Fetch real data on mount if not already present
+  useEffect(() => {
+    let isMounted = true;
+    const fetchUser = async () => {
+      try {
+        let fetched = null;
+        if (handleGetME) {
+          fetched = await handleGetME();
+        }
+        if (!fetched) {
+          const res = await GetMe();
+          fetched = res?.user || res?.data?.user;
+        }
+        if (isMounted && fetched) {
+          setUserData(fetched);
+          dispatch(setUser(fetched));
+          dispatch(setTechnician(fetched));
+        }
+      } catch (err) {
+        console.warn('Dashboard user fetch note:', err?.message || err);
+      }
+    };
+
+    fetchUser();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const firstName = userData?.FullName ? userData.FullName.split(' ')[0] : 'Partner';
+
+  const upcomingJobs = [
+    {
+      id: 'JOB-9021',
+      name: 'Vikram Malhotra',
+      phone: '+91 98234 56789',
+      service: 'Kitchen Sink Drain Blockage & Trap Cleaning',
+      category: 'Blockage Removal',
+      icon: '🔧',
+      timeSlot: '11:30 AM Today',
+      distance: '1.8 km away',
+      price: '₹500',
+      address: 'Plot 44, MP Nagar Zone-II, Bhopal',
+    },
+    {
+      id: 'JOB-9022',
+      name: 'Anita Rao',
+      phone: '+91 97112 34567',
+      service: 'Overhead Tank Motor & Automatic Float Valve Fitting',
+      category: 'Smart Installation',
+      icon: '⚙️',
+      timeSlot: '02:00 PM Today',
+      distance: '3.4 km away',
+      price: '₹1,200',
+      address: 'B-201, Silver Springs, Hoshangabad Rd, Bhopal',
+    },
+    {
+      id: 'JOB-9023',
+      name: 'Deepak Patel',
+      phone: '+91 98930 11223',
+      service: 'Bathroom Mixer Tap & CPVC Concealed Line Replacement',
+      category: 'Sanitary Fitting',
+      icon: '🚰',
+      timeSlot: '04:30 PM Today',
+      distance: '4.1 km away',
+      price: '₹850',
+      address: 'E-7, Arera Colony, Bhopal',
+    },
+  ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#070E1A] text-white font-['Plus_Jakarta_Sans',sans-serif] selection:bg-cyan-500/30 selection:text-cyan-300 relative overflow-x-hidden">
       
-      {/* Header */}
-      <header className="border-b border-slate-200">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-              </div>
-              <div>
-                <h1 className="text-xl font-black text-slate-900">Welcome, Rizwan!</h1>
-                <p className="text-sm text-slate-600">Technician Dashboard</p>
-              </div>
-            </div>
+      {/* Background Hero Image matching Home.jsx with smooth entrance */}
+      <div
+        className={`fixed inset-0 bg-cover bg-center bg-no-repeat transition-all duration-1000 ease-out pointer-events-none transform ${
+          visible ? 'opacity-30 scale-100' : 'opacity-0 scale-105'
+        }`}
+        style={{ backgroundImage: `url('/images/hero-bg.png')` }}
+      />
 
-            <div className="flex items-center gap-4">
+      {/* Deep Midnight Navy Gradient Overlays matching Home.jsx */}
+      <div className="fixed inset-0 bg-gradient-to-b from-[#070E1A]/95 via-[#0A1628]/92 to-[#070E1A]/98 pointer-events-none" />
+
+      {/* Ambient Glowing Spheres matching Home.jsx */}
+      <div className="fixed top-24 right-1/4 w-[480px] h-[480px] bg-cyan-500/10 rounded-full blur-[140px] pointer-events-none" />
+      <div className="fixed bottom-24 left-10 w-[420px] h-[420px] bg-orange-500/10 rounded-full blur-[140px] pointer-events-none" />
+
+      {/* ── Top Header Navigation Bar ─────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#0A1628]/80 backdrop-blur-2xl border-b border-white/10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3 sm:gap-4">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center shadow-[0_0_18px_rgba(6,182,212,0.4)] text-white text-lg">
+              🔧
+            </div>
+            <div>
               <div className="flex items-center gap-2">
-                <span className={`text-sm font-bold ${isOnline ? 'text-green-600' : 'text-slate-400'}`}>
-                  {isOnline ? 'Online' : 'Offline'}
+                <h1 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-lg sm:text-xl text-white tracking-tight">
+                  Welcome, {firstName}!
+                </h1>
+                <span className="hidden sm:inline-block px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-cyan-500/15 text-cyan-400 border border-cyan-500/30">
+                  Master Tech
                 </span>
-                <button
-                  onClick={() => setIsOnline(!isOnline)}
-                  className={`relative w-12 h-6 rounded-full transition-colors ${isOnline ? 'bg-green-600' : 'bg-slate-300'}`}
-                >
-                  <span className={`absolute top-1 left-1 w-4 h-4 bg-white rounded-full transition-transform ${isOnline ? 'translate-x-6' : 'translate-x-0'}`} />
-                </button>
               </div>
-              
-              <button onClick={() => navigate('/TechnicianNotification')} className="relative p-2 bg-slate-100 rounded-lg hover:bg-slate-200">
-                <svg className="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                </svg>
-                <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full" />
-              </button>
+              <p className="text-xs text-white/50 font-medium">Technician Operations Hub • 24/7 Dispatch</p>
+            </div>
+          </div>
 
-              <button onClick={() => navigate('/Technician-Profile')} className="w-9 h-9 bg-slate-100 rounded-full overflow-hidden border-2 border-slate-200">
-                <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=80&q=80" alt="" className="w-full h-full object-cover" />
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Online / Offline Toggle */}
+            <div className="flex items-center gap-2.5 bg-white/5 border border-white/10 px-3 py-1.5 rounded-2xl">
+              <span
+                className={`w-2 h-2 rounded-full ${
+                  isOnline
+                    ? 'bg-emerald-400 shadow-[0_0_8px_#34d399] animate-pulse'
+                    : 'bg-white/30'
+                }`}
+              />
+              <span
+                className={`text-xs font-bold ${
+                  isOnline ? 'text-emerald-400' : 'text-white/40'
+                }`}
+              >
+                {isOnline ? 'Online' : 'Offline'}
+              </span>
+              <button
+                type="button"
+                onClick={() => setIsOnline(!isOnline)}
+                className={`relative w-11 h-6 rounded-full transition-colors duration-300 cursor-pointer ${
+                  isOnline ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.45)]' : 'bg-white/15'
+                }`}
+              >
+                <span
+                  className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow-md transition-transform duration-300 ${
+                    isOnline ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
               </button>
             </div>
+
+            {/* Notification Bell */}
+            <button
+              onClick={() => navigate('/TechnicianNotification')}
+              className="relative p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white/70 hover:text-white transition-all cursor-pointer"
+              title="Notifications"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full shadow-[0_0_6px_#f97316] animate-ping" />
+              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-orange-500 rounded-full" />
+            </button>
+
+            {/* Profile Avatar Button */}
+            <button
+              onClick={() => navigate('/Technician-Profile')}
+              className="w-10 h-10 rounded-xl overflow-hidden border-2 border-cyan-500/40 hover:border-cyan-400 ring-2 ring-cyan-500/20 shadow-[0_0_12px_rgba(6,182,212,0.3)] transition-all cursor-pointer"
+              title="View Profile"
+            >
+              <img
+                src="https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=120&q=80"
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            </button>
+
+            {/* Logout Button */}
+            <button
+              onClick={onLogout}
+              disabled={loggingOut}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 hover:border-rose-500/40 text-rose-400 hover:text-rose-300 text-xs font-bold transition-all cursor-pointer disabled:opacity-50"
+              title="Logout from Partner Session"
+            >
+              <svg className={`w-4 h-4 ${loggingOut ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="hidden sm:inline">{loggingOut ? 'Logging out...' : 'Logout'}</span>
+            </button>
           </div>
         </div>
       </header>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
-        
-        {/* Stats */}
-        <div className="grid sm:grid-cols-2 gap-4 mb-8">
-          <div className="bg-blue-50 border-2 border-blue-200 rounded-lg p-6">
-            <p className="text-sm font-bold text-blue-600 mb-1">Today's Jobs</p>
-            <p className="text-4xl font-black text-blue-600">4</p>
+      {/* ── Main Dashboard Body ───────────────────────────────── */}
+      <main
+        className={`relative z-10 max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-10 transition-all duration-700 ease-out transform ${
+          visible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'
+        }`}
+      >
+        {/* Availability Banner */}
+        {!isOnline && (
+          <div className="mb-6 bg-orange-500/10 border border-orange-500/30 rounded-2xl p-4 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <span className="text-xl">⏸️</span>
+              <p className="text-xs sm:text-sm text-orange-300 font-semibold">
+                You are currently offline. Toggle your status to <strong>Online</strong> to start receiving immediate high-priority customer dispatches.
+              </p>
+            </div>
+            <button
+              onClick={() => setIsOnline(true)}
+              className="px-4 py-1.5 rounded-xl bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs shadow-[0_0_16px_rgba(255,107,53,0.4)] transition-all cursor-pointer whitespace-nowrap"
+            >
+              Go Online
+            </button>
           </div>
-          <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6">
-            <p className="text-sm font-bold text-green-600 mb-1">Today's Earnings</p>
-            <p className="text-4xl font-black text-green-600">₹1,200</p>
+        )}
+
+        {/* ── Stats Grid (matching Home.jsx style) ────────────── */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="bg-[#0A1628]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-cyan-500/40 transition-all duration-300 group">
+            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Today's Jobs</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+              4
+            </p>
+            <p className="text-[11px] text-emerald-400 font-bold mt-2 flex items-center gap-1">
+              <span>⚡ 1 In Progress</span>
+            </p>
+          </div>
+
+          <div className="bg-[#0A1628]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-emerald-500/40 transition-all duration-300 group">
+            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Today's Earnings</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-emerald-400 to-teal-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+              ₹1,850
+            </p>
+            <p className="text-[11px] text-white/40 mt-2">Direct bank deposit</p>
+          </div>
+
+          <div className="bg-[#0A1628]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-orange-500/40 transition-all duration-300 group">
+            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Rating Score</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-orange-400 to-amber-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+              4.95 ★
+            </p>
+            <p className="text-[11px] text-emerald-400 font-bold mt-2">Top 1% rated</p>
+          </div>
+
+          <div className="bg-[#0A1628]/85 backdrop-blur-xl border border-white/10 rounded-2xl p-5 hover:border-violet-500/40 transition-all duration-300 group">
+            <p className="text-xs uppercase font-bold text-white/50 tracking-wider mb-2">Response Rate</p>
+            <p className="font-['Plus_Jakarta_Sans',sans-serif] text-3xl sm:text-4xl font-black bg-gradient-to-r from-violet-400 to-purple-300 bg-clip-text text-transparent group-hover:scale-105 transition-transform origin-left">
+              100%
+            </p>
+            <p className="text-[11px] text-white/40 mt-2">Zero missed alerts</p>
           </div>
         </div>
 
-        {/* Current Assignment */}
+        {/* ── Current Assignment (High Priority Emergency Dispatch) ── */}
         <section className="mb-8">
-          <h2 className="text-2xl font-black text-slate-900 mb-4">Current Assignment</h2>
-          <div className="bg-white border-2 border-red-500 rounded-lg p-6">
-            <div className="flex items-start justify-between mb-4">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_8px_#f43f5e] animate-ping" />
+              <h2 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl sm:text-2xl text-white">
+                Current Active Assignment
+              </h2>
+            </div>
+            <span className="px-3 py-1 bg-rose-500/15 border border-rose-500/30 text-rose-400 text-xs font-bold rounded-full uppercase tracking-wider">
+              🚨 Emergency Leakage
+            </span>
+          </div>
+
+          <div className="bg-[#0A1628]/85 backdrop-blur-2xl border border-rose-500/30 hover:border-rose-500/50 rounded-3xl p-6 sm:p-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)] transition-all">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-5 pb-5 border-b border-white/10">
               <div>
-                <h3 className="text-xl font-black text-slate-900">Rahul Sharma</h3>
-                <p className="text-slate-600 mt-1 flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  </svg>
+                <div className="flex items-center gap-3">
+                  <h3 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl text-white">
+                    Rahul Sharma
+                  </h3>
+                  <span className="text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full">
+                    Verified Customer
+                  </span>
+                </div>
+                <p className="text-sm text-white/70 mt-1 flex items-center gap-2">
+                  <span className="text-cyan-400">📍</span>
                   A-12, Arera Colony, Bhopal
-                  <span className="ml-2 px-2 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded">2.5 km</span>
+                  <span className="px-2 py-0.5 bg-cyan-500/15 text-cyan-400 text-xs font-bold rounded-lg border border-cyan-500/30">
+                    2.5 km away
+                  </span>
                 </p>
               </div>
-              <span className="px-3 py-1 bg-red-50 text-red-600 text-xs font-bold rounded">HIGH PRIORITY</span>
+
+              <div className="text-left sm:text-right">
+                <span className="text-xs text-white/50 uppercase font-semibold">Service Value</span>
+                <p className="font-['Plus_Jakarta_Sans',sans-serif] text-2xl font-black text-cyan-400">
+                  ₹450 <span className="text-xs font-normal text-white/50">+ Parts</span>
+                </p>
+              </div>
             </div>
 
-            <div className="bg-slate-50 rounded-lg p-4 mb-4">
-              <p className="text-sm font-bold text-slate-900 mb-2">Dell Inspiron 15</p>
-              <p className="text-sm text-slate-600">Issue: Screen flickering and battery draining fast</p>
+            {/* Service Details Card */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-5 mb-6">
+              <div className="flex items-center gap-2 text-cyan-300 font-bold text-sm mb-1.5">
+                <span>💧</span>
+                <span>CPVC Pipe Concealed Leakage & Flush Tank Repair</span>
+              </div>
+              <p className="text-xs sm:text-sm text-white/60 leading-relaxed">
+                Water spraying near main riser line inside bathroom wall. Customer requested emergency isolation and joint sealing under FRRF 30-Day Guarantee.
+              </p>
             </div>
 
-            <div className="flex gap-3">
-              <button className="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-colors">
-                Accept & Start
+            {/* Dispatch Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <button
+                onClick={() => setAcceptedJob(true)}
+                className={`flex-1 flex items-center justify-center gap-2 font-['Plus_Jakarta_Sans',sans-serif] font-bold py-3.5 px-6 rounded-xl transition-all duration-200 cursor-pointer ${
+                  acceptedJob
+                    ? 'bg-emerald-500 text-slate-950 shadow-[0_0_24px_rgba(16,185,129,0.4)]'
+                    : 'bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white shadow-[0_0_24px_rgba(255,107,53,0.38)]'
+                }`}
+              >
+                {acceptedJob ? '✓ In Progress (Navigating)' : 'Accept & Start Navigation →'}
               </button>
-              <button className="flex-1 bg-white border-2 border-slate-200 hover:border-slate-300 text-slate-700 font-bold py-3 rounded-lg transition-colors">
-                View Location
-              </button>
+
+              <a
+                href="tel:+919876543210"
+                className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-white/12 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold py-3.5 px-6 rounded-xl transition-all duration-200 cursor-pointer"
+              >
+                📞 Call Client
+              </a>
+
+              <a
+                href="https://maps.google.com/?q=Arera+Colony,+Bhopal"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 border border-cyan-500/30 text-cyan-300 font-['Plus_Jakarta_Sans',sans-serif] font-bold py-3.5 px-6 rounded-xl transition-all duration-200 cursor-pointer"
+              >
+                🗺️ View GPS Route
+              </a>
             </div>
           </div>
         </section>
 
-        {/* Upcoming Jobs */}
-        <section>
-          <h2 className="text-2xl font-black text-slate-900 mb-4">Upcoming Queue</h2>
+        {/* ── Upcoming Jobs Queue ──────────────────────────────── */}
+        <section className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-xl sm:text-2xl text-white">
+                Upcoming Queue
+              </h2>
+              <p className="text-xs text-white/50">Scheduled plumbing service orders queued for today</p>
+            </div>
+            <span className="text-xs font-bold text-cyan-400 bg-cyan-500/10 border border-cyan-500/30 px-3 py-1 rounded-full">
+              3 Confirmed Leads
+            </span>
+          </div>
+
           <div className="space-y-3">
-            {[
-              { name: 'Amit Kumar', model: 'HP Pavilion', issue: 'Keyboard not working' },
-              { name: 'Priya Singh', model: 'MacBook Air', issue: 'OS Installation' },
-            ].map((job, i) => (
-              <div key={i} className="bg-white border-2 border-slate-200 rounded-lg p-5 hover:border-blue-600 transition-colors cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center font-bold text-slate-600">
-                      {job.name.split(' ').map(n => n[0]).join('')}
+            {upcomingJobs.map((job) => (
+              <div
+                key={job.id}
+                className="bg-[#0A1628]/85 backdrop-blur-xl border border-white/10 hover:border-cyan-500/40 rounded-2xl p-5 transition-all duration-200 group"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex items-start sm:items-center gap-4">
+                    <div className="w-12 h-12 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-xl shrink-0 group-hover:scale-105 transition-transform">
+                      {job.icon}
                     </div>
                     <div>
-                      <p className="font-bold text-slate-900">{job.name}</p>
-                      <p className="text-sm text-slate-600">{job.model} • {job.issue}</p>
+                      <div className="flex items-center gap-2.5">
+                        <p className="font-bold text-base text-white">{job.name}</p>
+                        <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-white/5 text-white/60 border border-white/10">
+                          {job.category}
+                        </span>
+                      </div>
+                      <p className="text-xs sm:text-sm text-cyan-300 font-medium mt-0.5">
+                        {job.service}
+                      </p>
+                      <p className="text-xs text-white/40 mt-1">
+                        📍 {job.address} • <strong className="text-white/60">{job.distance}</strong>
+                      </p>
                     </div>
                   </div>
-                  <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
-                  </svg>
+
+                  <div className="flex items-center justify-between sm:justify-end gap-4 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-white/10">
+                    <div className="text-left sm:text-right">
+                      <span className="text-[11px] text-white/40 font-medium block">{job.timeSlot}</span>
+                      <span className="font-['Plus_Jakarta_Sans',sans-serif] font-black text-lg text-emerald-400">
+                        {job.price}
+                      </span>
+                    </div>
+
+                    <a
+                      href={`tel:${job.phone}`}
+                      className="px-3.5 py-2 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-white transition-all cursor-pointer"
+                    >
+                      Call
+                    </a>
+                  </div>
                 </div>
               </div>
             ))}
           </div>
         </section>
+
+        {/* ── Footer Navigation Hub ────────────────────────────── */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 bg-white/4 border border-white/10 rounded-2xl p-4 sm:p-6 backdrop-blur-xl">
+          <div className="flex items-center gap-3">
+            <span className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/25 flex items-center justify-center text-orange-400 text-lg">
+              🛠️
+            </span>
+            <div>
+              <h4 className="text-sm font-bold text-white">Technician Partner Network</h4>
+              <p className="text-xs text-white/50">
+                Logged in as <strong>{userData?.FullName || 'Technician'}</strong> ({userData?.contact || '+91 98765 43210'})
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
+              onClick={() => navigate('/Technician-Profile')}
+              className="flex-1 sm:flex-none bg-gradient-to-br from-orange-500 to-orange-700 hover:from-orange-600 hover:to-orange-800 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm px-6 py-3 rounded-xl shadow-[0_0_24px_rgba(255,107,53,0.38)] transition-all duration-200 cursor-pointer"
+            >
+              My Profile →
+            </button>
+            <button
+              onClick={() => navigate('/TechnicianNotification')}
+              className="flex-1 sm:flex-none bg-white/5 hover:bg-white/10 border border-white/12 text-white font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm px-5 py-3 rounded-xl transition-all duration-200 cursor-pointer"
+            >
+              Alerts
+            </button>
+            <button
+              onClick={onLogout}
+              disabled={loggingOut}
+              className="flex-1 sm:flex-none bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/25 text-rose-400 font-['Plus_Jakarta_Sans',sans-serif] font-bold text-sm px-5 py-3 rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50"
+            >
+              {loggingOut ? 'Logging out...' : 'Logout'}
+            </button>
+          </div>
+        </div>
 
       </main>
     </div>
