@@ -748,7 +748,7 @@ export async function LogoutController(req, res) {
 
   await BlackListModel.create({ token: token });
 
- req.status(200).json({
+ res.status(200).json({
   message:"User Logout Successfully"
  })
 }
