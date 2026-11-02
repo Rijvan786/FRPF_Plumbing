@@ -528,7 +528,7 @@ export async function LoginController(req, res) {
     ]
    }).select("+password")
 
-    console.log(user.password,"USER.PASSWORD");
+  
 
     if (!user) {
       return res.status(404).json({
