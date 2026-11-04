@@ -1,8 +1,7 @@
 import axios from "axios"
-const API_URL =  "https://frpf-plumbing.onrender.com"
 const api=axios.create({
-    baseURL:API_URL,
-    withCredentials:true
+  baseURL:"https://frpf-plumbing.onrender.com/api/auth",
+ withCredentials:true
 })
 
       
@@ -12,7 +11,7 @@ export async function Register({FullName,email,contact,city,
       role,
       password,}){
         
-        const response=await api.post("/api/auth/register",{
+        const response=await api.post("/register",{
             FullName,email,contact,city,isVerifiedTech,experienceYears,role,password
         })
 
@@ -22,7 +21,7 @@ export async function Register({FullName,email,contact,city,
 
 export async function Login({FullName,email,  password}){
   
-    const  response=await api.post("/api/auth/login",{email, FullName, password})
+    const  response=await api.post("/login",{email, FullName, password})
 
     return response.data
 }
@@ -30,33 +29,33 @@ export async function Login({FullName,email,  password}){
 
 export async function ResendMail({email}){
     
-    const response=await api.post("/api/auth/resend-verification",{email})
+    const response=await api.post("/resend-verification",{email})
 
     return response.data
 }
 
 export async function ForgetMail({email}){
 
-    const response=await api.post("/api/auth/reset-password-mail",email)
+    const response=await api.post("/reset-password-mail",email)
      return response.data
 }
 
 export async function ForgetPassword({email,NewPassword}){
     
-    const response=await api.patch("/api/auth/reset-password",
+    const response=await api.patch("/reset-password",
         {email,NewPassword}
     )
    return response.data
 }
 
 export async function Logout(){
-    const response=await api.get("/api/auth/logout")
+    const response=await api.get("/logout")
 
     return response
 }
 
 export async function GetMe(){
-    const response=await api.get("/api/auth/get-me")
+    const response=await api.get("/get-me")
     console.log(response);
     return response.data
 }

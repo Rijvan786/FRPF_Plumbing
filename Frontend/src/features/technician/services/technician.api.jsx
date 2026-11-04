@@ -1,14 +1,13 @@
 import axios from "axios"
-const API_URL =  "https://frpf-plumbing.onrender.com"
 const api=axios.create({
-    baseURL:API_URL,
+    baseURL:"https://frpf-plumbing.onrender.com/api/technician",
     withCredentials:true
 })
 
       
 export async function TechRegister({FullName,email,contact,password,role,experienceYears,street,city,pin_code,longitude,latitude}){
         
-        const response=await api.post("/api/technician/technicianRegister",{
+        const response=await api.post("/technicianRegister",{
             FullName,email,contact,password,role,experienceYears,street,city,pin_code,longitude,latitude
         })
 
